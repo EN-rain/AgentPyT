@@ -11,7 +11,7 @@
 
 ## Flow Overview
 1. User calls CLI or MCP tool.
-2. Scanner requests discovery seeds from PyAgentT slow endpoints.
+2. Scanner requests discovery seeds from AgentPyT slow endpoints.
 3. Scanner expands tokens to pairs via fast endpoints.
 4. Scoring engine ranks candidates.
 5. UI or JSON serializer returns output.

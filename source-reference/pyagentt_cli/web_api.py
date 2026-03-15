@@ -226,8 +226,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="PyAgentT Web Local",
-    description="Local website companion for PyAgentT",
+    title="AgentPyT Web Local",
+    description="Local website companion for AgentPyT",
     version="0.1.0",
     lifespan=lifespan,
 )

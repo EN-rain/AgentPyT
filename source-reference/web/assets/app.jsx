@@ -7,79 +7,148 @@ async function apiRequest(path, options = {}) {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options,
   });
-  const contentType = response.headers.get("content-type") || "";
-  const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+  const ct = response.headers.get("content-type") || "";
+  const payload = ct.includes("application/json") ? await response.json() : await response.text();
   if (!response.ok) {
-    const message = typeof payload === "string" ? payload : payload?.detail || payload?.error || "Request failed";
-    throw new Error(message);
+    const msg = typeof payload === "string" ? payload : payload?.detail || payload?.error || "Request failed";
+    throw new Error(msg);
   }
   return payload;
 }
 
 function money(value) {
-  const number = Number(value || 0);
-  if (number >= 1_000_000_000) return `$${(number / 1_000_000_000).toFixed(2)}B`;
-  if (number >= 1_000_000) return `$${(number / 1_000_000).toFixed(2)}M`;
-  if (number >= 1_000) return `$${(number / 1_000).toFixed(2)}K`;
-  return `$${number.toFixed(2)}`;
+  const n = Number(value || 0);
+  if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000)     return `$${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000)         return `$${(n / 1_000).toFixed(2)}K`;
+  return `$${n.toFixed(2)}`;
 }
 
 function formatPrice(value) {
-  const number = Number(value || 0);
-  if (number >= 1) return number.toFixed(4);
-  if (number >= 0.01) return number.toFixed(6);
-  return number.toFixed(10);
+  const n = Number(value || 0);
+  if (n >= 1)    return n.toFixed(4);
+  if (n >= 0.01) return n.toFixed(6);
+  return n.toFixed(10);
+}
+
+function scoreTier(s) {
+  const n = Number(s || 0);
+  if (n >= 70) return "score-good";
+  if (n >= 40) return "score-mid";
+  return "score-bad";
+}
+
+function ScoreBar({ score }) {
+  const s = Math.min(100, Math.max(0, Number(score || 0)));
+  const tier = scoreTier(s);
+  return (
+    <div className={`score-wrap ${tier}`}>
+      <div className="score-bar-track">
+        <div className="score-bar-fill" style={{ width: `${s}%` }} />
+      </div>
+      <span className="score-val">{s.toFixed(1)}</span>
+    </div>
+  );
+}
+
+function ChainPill({ chain }) {
+  return <span className={`chain-pill ${chain}`}>{chain}</span>;
+}
+
+function Change({ value }) {
+  const n = Number(value || 0);
+  const cls = n >= 0 ? "change-up" : "change-down";
+  return <span className={cls}>{n >= 0 ? "+" : ""}{n.toFixed(2)}%</span>;
+}
+
+function Dropdown({ value, options, onChange, placeholder }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const onClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
+  const selected = options.find((o) => o.value === value) || { label: placeholder || "Select..." };
+
+  return (
+    <div className={`custom-dropdown ${open ? "open" : ""}`} ref={ref}>
+      <div className="dropdown-trigger" onClick={() => setOpen(!open)}>
+        <span>{selected.label}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dropdown-arrow">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+      {open && (
+        <div className="dropdown-menu">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={`dropdown-option ${opt.value === value ? "selected" : ""}`}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              {opt.label}
+              {opt.value === value && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dropdown-check">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function App() {
   const [chainChecks, setChainChecks] = useState({
-    solana: true,
-    base: true,
-    ethereum: true,
-    bsc: true,
-    arbitrum: false,
-    polygon: false,
-    optimism: false,
-    avalanche: false,
+    solana: true, base: true, ethereum: true, bsc: true,
+    arbitrum: false, polygon: false, optimism: false, avalanche: false,
   });
 
-  const [profile, setProfile] = useState("");
-  const [preset, setPreset] = useState("");
-  const [limit, setLimit] = useState(20);
-  const [minLiq, setMinLiq] = useState(20000);
-  const [minVol, setMinVol] = useState(40000);
-  const [minTx, setMinTx] = useState(25);
-  const [minPct, setMinPct] = useState(-10);
+  const [profile, setProfile]             = useState("");
+  const [preset, setPreset]               = useState("");
+  const [limit, setLimit]                 = useState(20);
+  const [minLiq, setMinLiq]               = useState(20000);
+  const [minVol, setMinVol]               = useState(40000);
+  const [minTx, setMinTx]                 = useState(25);
+  const [minPct, setMinPct]               = useState(-10);
   const [watchInterval, setWatchInterval] = useState(5);
 
-  const [results, setResults] = useState([]);
-  const [scanMeta, setScanMeta] = useState("No scan yet");
-  const [healthPill, setHealthPill] = useState({ text: "Checking runtime...", className: "neutral" });
-  const [watchPill, setWatchPill] = useState({ text: "Live watch: stopped", className: "neutral" });
+  const [results, setResults]       = useState([]);
+  const [scanMeta, setScanMeta]     = useState("No scan yet");
+  const [loading, setLoading]       = useState(false);
+  const [healthPill, setHealthPill] = useState({ text: "Connecting…", className: "neutral" });
+  const [watchPill, setWatchPill]   = useState({ text: "Idle", className: "neutral" });
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery]     = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
-  const [inspectChain, setInspectChain] = useState("solana");
+  const [searchError, setSearchError]     = useState("");
+  const [inspectChain, setInspectChain]   = useState("solana");
   const [inspectAddress, setInspectAddress] = useState("");
-  const [inspectOutput, setInspectOutput] = useState("");
+  const [inspectOutput, setInspectOutput]   = useState("");
 
   const [presetName, setPresetName] = useState("");
-  const [presets, setPresets] = useState([]);
-
-  const [taskName, setTaskName] = useState("");
+  const [presets, setPresets]       = useState([]);
+  const [taskName, setTaskName]     = useState("");
   const [taskInterval, setTaskInterval] = useState(60);
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks]           = useState([]);
 
   const watchRef = useRef(null);
-  const selectedChains = useMemo(
-    () => ALL_CHAINS.filter((chain) => chainChecks[chain]),
-    [chainChecks],
-  );
+  const selectedChains = useMemo(() => ALL_CHAINS.filter((c) => chainChecks[c]), [chainChecks]);
 
-  const setError = (error) => {
-    setHealthPill({ text: String(error?.message || error), className: "bad" });
-  };
+  const setError = (e) => setHealthPill({ text: String(e?.message || e), className: "bad" });
 
   const scanPayload = () => ({
     chains: selectedChains,
@@ -93,438 +162,453 @@ function App() {
   });
 
   const runScan = async () => {
-    const data = await apiRequest("/api/scan/hot", {
-      method: "POST",
-      body: JSON.stringify(scanPayload()),
-    });
-    setResults(data.results || []);
-    setScanMeta(`${data.count} rows | ${new Date().toLocaleTimeString()}`);
+    setLoading(true);
+    try {
+      const data = await apiRequest("/api/scan/hot", { method: "POST", body: JSON.stringify(scanPayload()) });
+      setResults(data.results || []);
+      setScanMeta(`${data.count} tokens · ${new Date().toLocaleTimeString()}`);
+    } catch (e) { setError(e); }
+    setLoading(false);
   };
 
   const stopWatch = () => {
-    if (watchRef.current) {
-      watchRef.current.close();
-      watchRef.current = null;
-    }
-    setWatchPill({ text: "Live watch: stopped", className: "neutral" });
+    if (watchRef.current) { watchRef.current.close(); watchRef.current = null; }
+    setWatchPill({ text: "Idle", className: "neutral" });
   };
 
   const startWatch = () => {
     stopWatch();
-    const payload = scanPayload();
+    const p = scanPayload();
     const params = new URLSearchParams({
-      chains: payload.chains.join(","),
-      limit: String(payload.limit),
-      min_liquidity_usd: String(payload.min_liquidity_usd),
-      min_volume_h24_usd: String(payload.min_volume_h24_usd),
-      min_txns_h1: String(payload.min_txns_h1),
-      min_price_change_h1: String(payload.min_price_change_h1),
+      chains: p.chains.join(","), limit: String(p.limit),
+      min_liquidity_usd: String(p.min_liquidity_usd),
+      min_volume_h24_usd: String(p.min_volume_h24_usd),
+      min_txns_h1: String(p.min_txns_h1),
+      min_price_change_h1: String(p.min_price_change_h1),
       interval: String(Number(watchInterval) || 5),
     });
-    if (payload.profile) params.set("profile", payload.profile);
-    if (payload.preset) params.set("preset", payload.preset);
-    const source = new EventSource(`/api/watch/stream?${params.toString()}`);
-    source.addEventListener("scan", (event) => {
-      const body = JSON.parse(event.data);
+    if (p.profile) params.set("profile", p.profile);
+    if (p.preset)  params.set("preset", p.preset);
+
+    const src = new EventSource(`/api/watch/stream?${params.toString()}`);
+    src.addEventListener("scan", (ev) => {
+      const body = JSON.parse(ev.data);
       setResults(body.results || []);
-      setScanMeta(`${body.count} rows | live ${new Date(body.timestamp).toLocaleTimeString()}`);
-      setWatchPill({ text: "Live watch: active", className: "ok" });
+      setScanMeta(`${body.count} tokens · live ${new Date(body.timestamp).toLocaleTimeString()}`);
+      setWatchPill({ text: "Live", className: "ok" });
     });
-    source.addEventListener("error", () => {
-      setWatchPill({ text: "Live watch: reconnecting", className: "neutral" });
-    });
-    source.onerror = () => {
-      setWatchPill({ text: "Live watch: reconnecting", className: "neutral" });
-    };
-    watchRef.current = source;
+    const onErr = () => setWatchPill({ text: "Reconnecting...", className: "neutral" });
+    src.addEventListener("error", onErr);
+    src.onerror = onErr;
+    watchRef.current = src;
+    setWatchPill({ text: "Connecting…", className: "neutral" });
   };
 
-  const runSearch = async () => {
-    if (!searchQuery.trim()) return;
-    const data = await apiRequest(`/api/search?query=${encodeURIComponent(searchQuery)}&limit=12`);
-    setSearchResults(data.results || []);
+  const runAction = async (fn) => { try { await fn(); } catch (e) { setError(e); } };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    if (searchError) setSearchError("");
   };
 
-  const runInspect = async () => {
-    if (!inspectAddress.trim()) return;
-    const data = await apiRequest(`/api/inspect/${encodeURIComponent(inspectChain)}/${encodeURIComponent(inspectAddress)}`);
-    setInspectOutput(JSON.stringify(data, null, 2));
-  };
+  const runSearch  = async () => {
+    const query = searchQuery.trim();
+    if (!query) {
+      setSearchResults([]);
+      setSearchError("Enter a token name, symbol, or address before searching.");
+      return;
+    }
 
-  const loadPresets = async () => {
-    const data = await apiRequest("/api/presets");
-    setPresets(data.items || []);
-  };
-
-  const savePreset = async () => {
-    if (!presetName.trim()) return;
-    const payload = scanPayload();
-    await apiRequest("/api/presets", {
-      method: "POST",
-      body: JSON.stringify({
-        name: presetName.trim(),
-        chains: payload.chains,
-        limit: payload.limit,
-        min_liquidity_usd: payload.min_liquidity_usd,
-        min_volume_h24_usd: payload.min_volume_h24_usd,
-        min_txns_h1: payload.min_txns_h1,
-        min_price_change_h1: payload.min_price_change_h1,
-      }),
-    });
-    setPresetName("");
-    await loadPresets();
-  };
-
-  const deletePreset = async (name) => {
-    await apiRequest(`/api/presets/${encodeURIComponent(name)}`, { method: "DELETE" });
-    await loadPresets();
-  };
-
-  const loadTasks = async () => {
-    const data = await apiRequest("/api/tasks");
-    setTasks(data.items || []);
-  };
-
-  const createTask = async () => {
-    if (!taskName.trim()) return;
-    const payload = scanPayload();
-    await apiRequest("/api/tasks", {
-      method: "POST",
-      body: JSON.stringify({
-        name: taskName.trim(),
-        preset: payload.preset,
-        chains: payload.chains,
-        limit: payload.limit,
-        min_liquidity_usd: payload.min_liquidity_usd,
-        min_volume_h24_usd: payload.min_volume_h24_usd,
-        min_txns_h1: payload.min_txns_h1,
-        min_price_change_h1: payload.min_price_change_h1,
-        interval_seconds: Number(taskInterval) || 60,
-      }),
-    });
-    setTaskName("");
-    await loadTasks();
-  };
-
-  const runTask = async (taskId) => {
-    const data = await apiRequest(`/api/tasks/${encodeURIComponent(taskId)}/run`, { method: "POST" });
-    setResults(data.results || []);
-    setScanMeta(`Task run ${taskId} | ${data.count} rows`);
-  };
-
-  const deleteTask = async (taskId) => {
-    await apiRequest(`/api/tasks/${encodeURIComponent(taskId)}`, { method: "DELETE" });
-    await loadTasks();
-  };
-
-  const runDueTasks = async () => {
-    const data = await apiRequest("/api/tasks/run-due", { method: "POST" });
-    setScanMeta(`Due tasks executed: ${data.due}`);
-    await loadTasks();
-  };
-
-  const loadHealth = async () => {
-    const data = await apiRequest("/api/health");
-    setHealthPill({ text: `Runtime OK | cache TTL ${data.cacheTtlSeconds}s`, className: "ok" });
-  };
-
-  const loadConfig = async () => {
-    const data = await apiRequest("/api/config");
-    setWatchInterval(data.config.watch_interval_seconds || 5);
-  };
-
-  const runAction = async (fn) => {
     try {
-      await fn();
-    } catch (error) {
-      setError(error);
+      const d = await apiRequest(`/api/search?query=${encodeURIComponent(query)}&limit=12`);
+      setSearchResults(d.results || []);
+      setSearchError("");
+    } catch (e) {
+      setSearchResults([]);
+      setSearchError(String(e?.message || e));
     }
   };
+  const runInspect = async () => {
+    if (!inspectAddress.trim()) return;
+    const d = await apiRequest(`/api/inspect/${encodeURIComponent(inspectChain)}/${encodeURIComponent(inspectAddress)}`);
+    setInspectOutput(JSON.stringify(d, null, 2));
+  };
+
+  const loadPresets  = async () => { const d = await apiRequest("/api/presets"); setPresets(d.items || []); };
+  const savePreset   = async () => {
+    if (!presetName.trim()) return;
+    const p = scanPayload();
+    await apiRequest("/api/presets", { method: "POST", body: JSON.stringify({ name: presetName.trim(), chains: p.chains, limit: p.limit, min_liquidity_usd: p.min_liquidity_usd, min_volume_h24_usd: p.min_volume_h24_usd, min_txns_h1: p.min_txns_h1, min_price_change_h1: p.min_price_change_h1 }) });
+    setPresetName(""); await loadPresets();
+  };
+  const deletePreset = async (n) => { await apiRequest(`/api/presets/${encodeURIComponent(n)}`, { method: "DELETE" }); await loadPresets(); };
+
+  const loadTasks    = async () => { const d = await apiRequest("/api/tasks"); setTasks(d.items || []); };
+  const createTask   = async () => {
+    if (!taskName.trim()) return;
+    const p = scanPayload();
+    await apiRequest("/api/tasks", { method: "POST", body: JSON.stringify({ name: taskName.trim(), preset: p.preset, chains: p.chains, limit: p.limit, min_liquidity_usd: p.min_liquidity_usd, min_volume_h24_usd: p.min_volume_h24_usd, min_txns_h1: p.min_txns_h1, min_price_change_h1: p.min_price_change_h1, interval_seconds: Number(taskInterval) || 60 }) });
+    setTaskName(""); await loadTasks();
+  };
+  const runTask      = async (id) => { const d = await apiRequest(`/api/tasks/${encodeURIComponent(id)}/run`, { method: "POST" }); setResults(d.results || []); setScanMeta(`Task ${id} · ${d.count} tokens`); };
+  const deleteTask   = async (id) => { await apiRequest(`/api/tasks/${encodeURIComponent(id)}`, { method: "DELETE" }); await loadTasks(); };
+  const runDueTasks  = async () => { const d = await apiRequest("/api/tasks/run-due", { method: "POST" }); setScanMeta(`Due tasks: ${d.due} run`); await loadTasks(); };
+
+  const loadHealth = async () => { const d = await apiRequest("/api/health"); setHealthPill({ text: `Runtime OK · TTL ${d.cacheTtlSeconds}s`, className: "ok" }); };
+  const loadConfig = async () => { const d = await apiRequest("/api/config"); setWatchInterval(d.config.watch_interval_seconds || 5); };
 
   useEffect(() => {
-    runAction(async () => {
-      await loadHealth();
-      await loadConfig();
-      await loadPresets();
-      await loadTasks();
-    });
-    return () => {
-      stopWatch();
-    };
+    runAction(async () => { await loadHealth(); await loadConfig(); await loadPresets(); await loadTasks(); });
+    return () => stopWatch();
   }, []);
 
-  const resultCount = results.length;
+  // Aggregate stats from results
+  const avgScore = results.length
+    ? (results.reduce((s, r) => s + Number(r.score || 0), 0) / results.length).toFixed(1)
+    : "—";
+  const topToken = results[0]?.tokenSymbol || "—";
 
   return (
-    <main className="app-shell">
+    <div className={`app-shell${sidebarCollapsed ? " sidebar-collapsed" : ""}`}>
+
+      {/* ═══════════ TOP BAR ═══════════ */}
       <header className="topbar">
-        <div>
-          <h1>PyAgentT Scanner</h1>
-          <p className="muted">Local workspace for scans, watch streams, presets, and scheduled runs.</p>
+        <div className="topbar-brand">
+          <button
+            type="button"
+            className="nav-toggle"
+            onClick={() => setSidebarCollapsed((prev) => !prev)}
+            aria-expanded={!sidebarCollapsed}
+            aria-controls="left-sidebar"
+          >
+            {sidebarCollapsed ? "Show Filters" : "Hide Filters"}
+          </button>
+          <h1><span className="logo-dot" />&nbsp;AgentPyT</h1>
         </div>
+
+        {/* Centre — action buttons always visible */}
+        <div className="topbar-center">
+          <div className="topbar-actions btn-group">
+            <button id="btn-run-scan" className="primary" onClick={runScan} disabled={loading}>
+              {loading ? "Scanning…" : "Run Scan"}
+            </button>
+            <button id="btn-watch" className="secondary" onClick={startWatch}>Watch</button>
+            <button id="btn-stop" className="danger" onClick={stopWatch}>Stop</button>
+          </div>
+        </div>
+
+        {/* Right — status */}
         <div className="topbar-meta">
           <span className={`status-chip ${healthPill.className}`}>{healthPill.text}</span>
           <span className={`status-chip ${watchPill.className}`}>{watchPill.text}</span>
         </div>
       </header>
 
-      <div className="workspace">
-        <aside className="sidebar panel">
-          <div className="panel-section">
-              <div className="section-header">
-                <h2>Filters</h2>
-              </div>
-              <div className="field-grid single">
-                <label>Chains</label>
-                <div className="checks">
-                  {ALL_CHAINS.map((chain) => (
-                    <label key={chain} className="check-item">
-                      <input
-                        type="checkbox"
-                        checked={chainChecks[chain]}
-                        onChange={(event) => setChainChecks((prev) => ({ ...prev, [chain]: event.target.checked }))}
-                      />
-                      <span>{chain}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div className="field-grid filter-grid">
-                <label>
-                  Profile
-                  <div className="select-wrap">
-                    <select value={profile} onChange={(event) => setProfile(event.target.value)}>
-                      <option value="">custom</option>
-                      <option value="discovery">discovery</option>
-                      <option value="balanced">balanced</option>
-                      <option value="strict">strict</option>
-                    </select>
-                  </div>
-                </label>
-                <label>
-                  Preset
-                  <input value={preset} onChange={(event) => setPreset(event.target.value)} type="text" placeholder="optional preset name" />
-                </label>
-                <label>
-                  Result limit
-                  <input value={limit} onChange={(event) => setLimit(event.target.value)} type="number" min="1" max="100" />
-                </label>
-                <label>
-                  Watch interval
-                  <input value={watchInterval} onChange={(event) => setWatchInterval(event.target.value)} type="number" min="2" max="120" />
-                </label>
-                <label>
-                  Min liquidity USD
-                  <input value={minLiq} onChange={(event) => setMinLiq(event.target.value)} type="number" min="0" />
-                </label>
-                <label>
-                  Min volume 24h USD
-                  <input value={minVol} onChange={(event) => setMinVol(event.target.value)} type="number" min="0" />
-                </label>
-                <label>
-                  Min txns 1h
-                  <input value={minTx} onChange={(event) => setMinTx(event.target.value)} type="number" min="0" />
-                </label>
-                <label>
-                  Min price change 1h
-                  <input value={minPct} onChange={(event) => setMinPct(event.target.value)} type="number" />
-                </label>
-              </div>
-              <div className="button-row">
-                <button className="primary" onClick={() => runAction(runScan)}>Run scan</button>
-                <button onClick={() => runAction(startWatch)}>Start watch</button>
-                <button className="danger" onClick={stopWatch}>Stop watch</button>
-              </div>
-          </div>
+      {/* ═══════════ SIDEBAR ═══════════ */}
+      <aside id="left-sidebar" className="sidebar">
 
-          <div className="panel-section summary-list">
-            <div className="summary-row">
-              <span>Selected chains</span>
-              <strong>{selectedChains.length}</strong>
-            </div>
-            <div className="summary-row">
-              <span>Loaded presets</span>
-              <strong>{presets.length}</strong>
-            </div>
-            <div className="summary-row">
-              <span>Scheduled tasks</span>
-              <strong>{tasks.length}</strong>
-            </div>
-            <div className="summary-row">
-              <span>Visible results</span>
-              <strong>{resultCount}</strong>
-            </div>
+        {/* Networks */}
+        <div className="panel-section">
+          <div className="section-label">Networks</div>
+          <div className="checks">
+            {ALL_CHAINS.map((chain) => (
+              <label key={chain} className="check-item">
+                <input
+                  type="checkbox"
+                  checked={chainChecks[chain]}
+                  onChange={(e) => setChainChecks((prev) => ({ ...prev, [chain]: e.target.checked }))}
+                />
+                {chain}
+              </label>
+            ))}
           </div>
-        </aside>
+        </div>
 
-        <section className="content">
-          <section className="panel">
-            <div className="results-header">
-              <div className="section-header no-margin">
-                <div>
-                  <h2>Results</h2>
-                  <p className="muted meta-line">{scanMeta}</p>
-                </div>
+        {/* Scan Profile */}
+        <div className="panel-section">
+          <div className="section-label">Profile &amp; Preset</div>
+          <div className="filter-grid">
+            <label className="full" style={{ zIndex: 11, position: "relative" }}>
+              Profile
+              <Dropdown 
+                value={profile} 
+                onChange={setProfile}
+                options={[
+                  { value: "", label: "custom" },
+                  { value: "discovery", label: "discovery" },
+                  { value: "balanced", label: "balanced" },
+                  { value: "strict", label: "strict" },
+                ]}
+              />
+            </label>
+            <label className="full">
+              Preset
+              <input value={preset} onChange={(e) => setPreset(e.target.value)} type="text" placeholder="optional name" />
+            </label>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="panel-section">
+          <div className="section-label">Filters</div>
+          <div className="filter-grid">
+            <label>
+              Limit
+              <input value={limit} onChange={(e) => setLimit(e.target.value)} type="number" min="1" max="100" />
+            </label>
+            <label>
+              Interval (s)
+              <input value={watchInterval} onChange={(e) => setWatchInterval(e.target.value)} type="number" min="2" max="120" />
+            </label>
+            <label>
+              Min Liq $
+              <input value={minLiq} onChange={(e) => setMinLiq(e.target.value)} type="number" min="0" />
+            </label>
+            <label>
+              Min Vol 24h $
+              <input value={minVol} onChange={(e) => setMinVol(e.target.value)} type="number" min="0" />
+            </label>
+            <label>
+              Min Txns 1h
+              <input value={minTx} onChange={(e) => setMinTx(e.target.value)} type="number" min="0" />
+            </label>
+            <label>
+              Min Chg 1h %
+              <input value={minPct} onChange={(e) => setMinPct(e.target.value)} type="number" />
+            </label>
+          </div>
+        </div>
+
+        {/* Session stats */}
+        <div className="panel-section" style={{ flex: 1 }}>
+          <div className="section-label">Session</div>
+          <div className="summary-list">
+            <div className="summary-row"><span>Chains</span><strong>{selectedChains.length}</strong></div>
+            <div className="summary-row"><span>Presets</span><strong>{presets.length}</strong></div>
+            <div className="summary-row"><span>Tasks</span><strong>{tasks.length}</strong></div>
+            <div className="summary-row"><span>Tokens</span><strong>{results.length}</strong></div>
+          </div>
+        </div>
+      </aside>
+
+      {/* ═══════════ MAIN CONTENT ═══════════ */}
+      <main className="content">
+
+        {/* Stats bar */}
+        <div className="stats-bar">
+          <div className="stat-item">
+            <span className="stat-label">Tokens Found</span>
+            <span className={`stat-value ${results.length > 0 ? "green" : "dim"}`}>{results.length}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Avg Score</span>
+            <span className="stat-value">{avgScore}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Top Token</span>
+            <span className="stat-value" style={{ fontSize: "12px" }}>{topToken}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Last Update</span>
+            <span className="stat-value dim">{scanMeta}</span>
+          </div>
+          <div className="stat-chains">
+            {selectedChains.map((c) => <ChainPill key={c} chain={c} />)}
+          </div>
+        </div>
+
+        {/* Scrollable results + lower panels */}
+        <div className="content-scroll">
+
+          {/* Results table */}
+          <div className="results-pane">
+            {results.length === 0 ? (
+              <div className="empty-table">
+                <div>No scan results yet</div>
+                <div className="empty-table-hint">Hit <strong>Run Scan</strong> or <strong>Watch</strong> in the toolbar above</div>
               </div>
-              <div className="results-summary muted mono">
-                <span>{resultCount} rows</span>
-                <span>{selectedChains.join(" | ")}</span>
-              </div>
-            </div>
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Token</th>
-                    <th>Chain</th>
-                    <th>Score</th>
-                    <th>Price</th>
-                    <th>1h</th>
-                    <th>Volume 24h</th>
-                    <th>Liquidity</th>
-                    <th>Txns 1h</th>
-                    <th>Tags</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {results.length === 0 ? (
+            ) : (
+              <div className="table-wrap">
+                <table>
+                  <thead>
                     <tr>
-                      <td colSpan="10" className="empty-cell">No scan results yet.</td>
+                      <th>#</th>
+                      <th>Token</th>
+                      <th>Chain</th>
+                      <th>Score</th>
+                      <th>Price</th>
+                      <th>1h %</th>
+                      <th style={{ textAlign: "right" }}>Vol 24h</th>
+                      <th style={{ textAlign: "right" }}>Liquidity</th>
+                      <th style={{ textAlign: "right" }}>Txns/1h</th>
+                      <th>Tags</th>
                     </tr>
-                  ) : (
-                    results.map((row, idx) => (
+                  </thead>
+                  <tbody>
+                    {results.map((row, idx) => (
                       <tr key={`${row.chainId}:${row.tokenAddress}:${idx}`}>
-                        <td>{idx + 1}</td>
-                        <td className="token-cell">
-                          <strong>{row.tokenSymbol || "?"}</strong>
-                          <span className="muted mono">{row.tokenAddress}</span>
+                        <td className="rank">{idx + 1}</td>
+                        <td>
+                          <div className="token-cell">
+                            <span className="token-symbol">{row.tokenSymbol || "?"}</span>
+                            <span className="token-addr">{row.tokenAddress}</span>
+                          </div>
                         </td>
-                        <td>{row.chainId}</td>
-                        <td className={row.score >= 70 ? "score-good" : row.score < 40 ? "score-bad" : ""}>{Number(row.score || 0).toFixed(2)}</td>
-                        <td>{formatPrice(row.priceUsd)}</td>
-                        <td>{Number(row.priceChangeH1 || 0).toFixed(2)}%</td>
-                        <td>{money(row.volumeH24)}</td>
-                        <td>{money(row.liquidityUsd)}</td>
-                        <td>{row.txnsH1 || 0}</td>
-                        <td>{(row.tags || []).join(", ") || "-"}</td>
+                        <td><ChainPill chain={row.chainId} /></td>
+                        <td><ScoreBar score={row.score} /></td>
+                        <td><span className="price-val mono">{formatPrice(row.priceUsd)}</span></td>
+                        <td><Change value={row.priceChangeH1} /></td>
+                        <td className="num-cell">{money(row.volumeH24)}</td>
+                        <td className="num-cell">{money(row.liquidityUsd)}</td>
+                        <td className="num-cell">{row.txnsH1 || 0}</td>
+                        <td>
+                          <div className="tag-list">
+                            {(() => {
+                              const tags = row.tags || [];
+                              const visible = tags.slice(0, 4);
+                              const extra = tags.length - visible.length;
+                              if (tags.length === 0) return <span className="empty-cell">—</span>;
+                              return (
+                                <>
+                                  {visible.map((t) => <span key={t} className="tag">{t}</span>)}
+                                  {extra > 0 && <span className="tag-more">+{extra}</span>}
+                                </>
+                              );
+                            })()}
+                          </div>
+                        </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
 
+          {/* 4-panel bottom grid */}
           <div className="content-grid">
-            <section className="panel">
-              <div className="section-header">
-                <h2>Search</h2>
-              </div>
+
+            {/* Search */}
+            <div className="grid-panel">
+              <div className="section-header"><h2>Search Pairs</h2></div>
               <div className="inline-form">
-                <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} type="text" placeholder="pepe or token address" />
-                <button onClick={() => runAction(runSearch)}>Search</button>
+                <input
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onKeyDown={(e) => e.key === "Enter" && runSearch()}
+                  type="text"
+                  className={searchError ? "field-error" : ""}
+                  placeholder="Name, symbol, or address…"
+                  aria-invalid={Boolean(searchError)}
+                  aria-describedby={searchError ? "search-feedback" : undefined}
+                />
+                <button onClick={runSearch}>Search</button>
               </div>
+              {searchError && (
+                <div id="search-feedback" className="field-popup field-popup-error" role="alert">
+                  {searchError}
+                </div>
+              )}
               {searchResults.length === 0 ? (
-                <p className="empty-state">No search results yet.</p>
+                searchError ? null : <div className="empty-state">No results — search above</div>
               ) : (
-                <div className="list">
+                <div className="item-list">
                   {searchResults.map((row, idx) => (
-                    <div className="list-item" key={`${row.chainId}:${row.tokenAddress}:${idx}`}>
-                      <div>
-                        <strong>{row.tokenSymbol}</strong>
-                        <div className="muted mono">{row.chainId} | {row.tokenAddress}</div>
+                    <div className="list-item" key={`sr-${idx}`}>
+                      <div className="list-item-info">
+                        <span className="list-item-name">{row.tokenSymbol}</span>
+                        <span className="list-item-meta"><ChainPill chain={row.chainId} /> &nbsp;{row.tokenAddress}</span>
                       </div>
-                      <div className="list-metric mono">{money(row.volumeH24)} / {money(row.liquidityUsd)}</div>
+                      <span className="list-metric">{money(row.volumeH24)} / {money(row.liquidityUsd)}</span>
                     </div>
                   ))}
                 </div>
               )}
-            </section>
+            </div>
 
-            <section className="panel">
-              <div className="section-header">
-                <h2>Inspect</h2>
-              </div>
+            {/* Inspect */}
+            <div className="grid-panel">
+              <div className="section-header"><h2>Deep Inspect</h2></div>
               <div className="inline-form">
-                <div className="select-wrap">
-                  <select value={inspectChain} onChange={(event) => setInspectChain(event.target.value)}>
-                    {ALL_CHAINS.map((chain) => (
-                      <option key={chain} value={chain}>{chain}</option>
-                    ))}
-                  </select>
+                <div style={{ flex: "0 0 130px", zIndex: 10, position: "relative" }}>
+                  <Dropdown 
+                    value={inspectChain} 
+                    onChange={setInspectChain}
+                    options={ALL_CHAINS.map((c) => ({ value: c, label: c }))}
+                  />
                 </div>
-                <input value={inspectAddress} onChange={(event) => setInspectAddress(event.target.value)} type="text" placeholder="token address" />
+                <input value={inspectAddress} onChange={(e) => setInspectAddress(e.target.value)} type="text" placeholder="Token address" />
                 <button onClick={() => runAction(runInspect)}>Inspect</button>
               </div>
-              {inspectOutput ? (
-                <pre className="mono pre">{inspectOutput}</pre>
-              ) : (
-                <p className="empty-state">No inspect output yet.</p>
-              )}
-            </section>
+              {inspectOutput
+                ? <pre className="pre">{inspectOutput}</pre>
+                : <div className="empty-state">Enter a token address to deep-dive its metrics</div>
+              }
+            </div>
 
-            <section className="panel">
-              <div className="section-header">
-                <h2>Presets</h2>
-              </div>
+            {/* Presets */}
+            <div className="grid-panel">
+              <div className="section-header"><h2>Presets</h2></div>
               <div className="inline-form">
-                <input value={presetName} onChange={(event) => setPresetName(event.target.value)} type="text" placeholder="new preset name" />
-                <button onClick={() => runAction(savePreset)}>Save current filters</button>
+                <input value={presetName} onChange={(e) => setPresetName(e.target.value)} type="text" placeholder="Preset name…" />
+                <button onClick={() => runAction(savePreset)}>Save filters</button>
               </div>
               {presets.length === 0 ? (
-                <p className="empty-state">No presets saved.</p>
+                <div className="empty-state">No presets saved — save current filters above</div>
               ) : (
-                <div className="list">
+                <div className="item-list">
                   {presets.map((item) => (
                     <div className="list-item" key={item.name}>
-                      <div>
-                        <strong>{item.name}</strong>
-                        <div className="muted mono">{(item.chains || []).join(", ")} | limit {item.limit}</div>
+                      <div className="list-item-info">
+                        <span className="list-item-name">{item.name}</span>
+                        <span className="list-item-meta">{(item.chains || []).join(", ")} · limit {item.limit}</span>
                       </div>
-                      <button onClick={() => runAction(() => deletePreset(item.name))}>Delete</button>
+                      <div className="list-item-actions">
+                        <button onClick={() => runAction(() => deletePreset(item.name))}>Delete</button>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
-            </section>
+            </div>
 
-            <section className="panel">
-              <div className="section-header">
-                <h2>Tasks</h2>
-              </div>
+            {/* Tasks */}
+            <div className="grid-panel">
+              <div className="section-header"><h2>Scheduled Tasks</h2></div>
               <div className="inline-form">
-                <input value={taskName} onChange={(event) => setTaskName(event.target.value)} type="text" placeholder="task name" />
-                <input value={taskInterval} onChange={(event) => setTaskInterval(event.target.value)} type="number" min="15" />
-                <button onClick={() => runAction(createTask)}>Create task</button>
+                <input value={taskName} onChange={(e) => setTaskName(e.target.value)} type="text" placeholder="Task name…" />
+                <input value={taskInterval} onChange={(e) => setTaskInterval(e.target.value)} type="number" min="15" style={{ flex: "0 0 64px" }} />
+                <button onClick={() => runAction(createTask)}>Create</button>
               </div>
-              <div className="inline-form compact-actions">
-                <button onClick={() => runAction(runDueTasks)}>Run due tasks</button>
+              <div className="btn-group" style={{ marginTop: 8 }}>
+                <button onClick={() => runAction(runDueTasks)}>Run due</button>
                 <button onClick={() => runAction(loadTasks)}>Refresh</button>
               </div>
               {tasks.length === 0 ? (
-                <p className="empty-state">No tasks created.</p>
+                <div className="empty-state">No tasks — create one above</div>
               ) : (
-                <div className="list">
+                <div className="item-list">
                   {tasks.map((item) => (
                     <div className="list-item" key={item.id}>
-                      <div>
-                        <strong>{item.name}</strong>
-                        <div className="muted mono">{item.status} | every {item.interval_seconds || 120}s | preset {item.preset || "-"}</div>
+                      <div className="list-item-info">
+                        <span className="list-item-name">{item.name}</span>
+                        <span className="list-item-meta">{item.status} · {item.interval_seconds || 120}s · preset {item.preset || "—"}</span>
                       </div>
-                      <div className="button-row compact">
+                      <div className="list-item-actions">
                         <button onClick={() => runAction(() => runTask(item.id))}>Run</button>
-                        <button onClick={() => runAction(() => deleteTask(item.id))}>Delete</button>
+                        <button onClick={() => runAction(() => deleteTask(item.id))}>Del</button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </section>
-          </div>
-        </section>
-      </div>
-    </main>
+            </div>
+
+          </div>{/* /content-grid */}
+        </div>{/* /content-scroll */}
+      </main>
+
+    </div>
   );
 }
 

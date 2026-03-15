@@ -1,12 +1,12 @@
-# PyAgentT - CLI + MCP + React Web
+# AgentPyT - CLI + MCP + React Web
 
-![PyAgentT CLI Screenshot](assets/screenshot.png)
+![AgentPyT CLI Screenshot](assets/screenshot.png)
 
-**100% free to use.** All APIs included are public and free - no PyAgentT API key required to get started. Optional free Moralis key unlocks holder data.
+**100% free to use.** All APIs included are public and free - no AgentPyT API key required to get started. Optional free Moralis key unlocks holder data.
 
-A visual terminal scanner, MCP server, and AI skill for PyAgentT token signals. **Unofficial** - not affiliated with or endorsed by PyAgentT.
+A visual terminal scanner, MCP server, and AI skill for AgentPyT token signals. **Unofficial** - not affiliated with or endorsed by AgentPyT.
 
-Scans hot tokens across every chain PyAgentT supports. Scores them by volume, liquidity, momentum, and flow pressure. Use it from the terminal, connect it to AI agents via MCP, or load it as a skill in Claude/Codex/OpenClaw.
+Scans hot tokens across every chain AgentPyT supports. Scores them by volume, liquidity, momentum, and flow pressure. Use it from the terminal, connect it to AI agents via MCP, or load it as a skill in Claude/Codex/OpenClaw.
 
 ---
 
@@ -14,8 +14,8 @@ Scans hot tokens across every chain PyAgentT supports. Scores them by volume, li
 
 **Windows:**
 ```
-git clone https://github.com/your-org/PyAgentT.git
-cd PyAgentT
+git clone https://github.com/your-org/AgentPyT.git
+cd AgentPyT
 install.bat
 ds setup
 ds hot
@@ -23,8 +23,8 @@ ds hot
 
 **Mac / Linux:**
 ```bash
-git clone https://github.com/your-org/PyAgentT.git
-cd PyAgentT
+git clone https://github.com/your-org/AgentPyT.git
+cd AgentPyT
 chmod +x install.sh && ./install.sh
 ./ds setup
 ./ds hot
@@ -87,8 +87,8 @@ Open your desktop's `Terminal` app from the application menu.
 Open a terminal and paste this:
 
 ```bash
-git clone https://github.com/your-org/PyAgentT.git
-cd PyAgentT
+git clone https://github.com/your-org/AgentPyT.git
+cd AgentPyT
 ```
 
 ### Step 2: Run the installer
@@ -369,7 +369,7 @@ Set up automated scans that run on a schedule and alert you via Discord, Telegra
 |---------|-------------|
 | `ds profiles` | Show built-in filter thresholds per chain |
 | `ds rate-stats` | Show runtime API usage, limits, and cache timing |
-| `ds why` | Explain why the project uses PyAgentT and what it optimizes for |
+| `ds why` | Explain why the project uses AgentPyT and what it optimizes for |
 | `ds god-prompt` | Print the repo's long-form extension prompt for AI-assisted development |
 
 ### JSON Output
@@ -407,7 +407,7 @@ Mac/Linux:
 {
   "mcpServers": {
     "pyagentt": {
-      "command": "/path/to/PyAgentT/.venv/bin/pyagentt-mcp",
+      "command": "/path/to/AgentPyT/.venv/bin/pyagentt-mcp",
       "args": []
     }
   }
@@ -419,7 +419,7 @@ Windows:
 {
   "mcpServers": {
     "pyagentt": {
-      "command": "C:\\path\\to\\PyAgentT\\.venv\\Scripts\\pyagentt-mcp.exe"
+      "command": "C:\\path\\to\\AgentPyT\\.venv\\Scripts\\pyagentt-mcp.exe"
     }
   }
 }
@@ -432,7 +432,7 @@ Mac/Linux:
 {
   "mcpServers": {
     "pyagentt": {
-      "command": "/path/to/PyAgentT/.venv/bin/pyagentt-mcp"
+      "command": "/path/to/AgentPyT/.venv/bin/pyagentt-mcp"
     }
   }
 }
@@ -443,7 +443,7 @@ Windows:
 {
   "mcpServers": {
     "pyagentt": {
-      "command": "C:\\path\\to\\PyAgentT\\.venv\\Scripts\\pyagentt-mcp.exe"
+      "command": "C:\\path\\to\\AgentPyT\\.venv\\Scripts\\pyagentt-mcp.exe"
     }
   }
 }
@@ -463,7 +463,7 @@ Windows:
 | "What's hot right now?" | Scans all chains and returns top scored tokens |
 | "Show me Solana tokens" | Scans Solana only |
 | "Find tokens on Base with high volume" | Scans Base with volume-focused filters |
-| "Search for pepe" | Searches PyAgentT for pepe tokens |
+| "Search for pepe" | Searches AgentPyT for pepe tokens |
 | "Tell me about this token: 0x..." | Inspects the specific token address |
 | "Save my current settings as degen-mode" | Creates a named preset |
 | "Set up a task that scans Solana every minute" | Creates a scheduled task |
@@ -513,7 +513,7 @@ Everything works out of the box with zero API keys. You can optionally add keys 
 
 | API | What it provides | Rate Limit |
 |-----|-----------------|------------|
-| [PyAgentT](https://docs.dexscreener.com/) | All token/pair data, prices, volume, liquidity, boosts, profiles | 60-300 rpm |
+| [AgentPyT](https://docs.dexscreener.com/) | All token/pair data, prices, volume, liquidity, boosts, profiles | 60-300 rpm |
 | [GeckoTerminal](https://www.geckoterminal.com/) | Holder counts, trending pools, new token discovery | Free tier |
 | [Blockscout](https://docs.blockscout.com/) | Holder counts for Ethereum and Base | Unlimited |
 | [Honeypot.is](https://honeypot.is/) | Holder counts for all EVM chains | Free tier |
@@ -548,7 +548,7 @@ Without any API keys, you still get holder counts on every chain through GeckoTe
 
 ### How rate limiting works
 
-PyAgentT enforces:
+AgentPyT enforces:
 - **60 rpm** for token profiles, boosts, orders
 - **300 rpm** for search, pairs, token-pairs
 
@@ -588,7 +588,7 @@ Each token gets a 0-100 score based on 8 weighted components:
 | **Transaction velocity** | Rate of transaction count increase |
 | **Relative strength** | Performance compared to the chain average |
 | **Breakout readiness** | Price compression patterns (coiling before a move) |
-| **Boost velocity** | Rate of PyAgentT boost activity |
+| **Boost velocity** | Rate of AgentPyT boost activity |
 | **Momentum decay** | Whether momentum is sustaining or fading |
 | **Liquidity depth** | Health and depth of the liquidity pool |
 | **Flow pressure** | Buy vs sell transaction imbalance |
@@ -670,7 +670,7 @@ For disclosure and reporting guidance, see [SECURITY.md](SECURITY.md).
 | Problem | Fix |
 |---------|-----|
 | No tokens found | Lower filters: `--min-liquidity-usd 10000 --min-txns-h1 5` |
-| Only Solana results | Expected when Solana dominates PyAgentT boosts. Try `--chains base` |
+| Only Solana results | Expected when Solana dominates AgentPyT boosts. Try `--chains base` |
 | Unicode garbled | Run `chcp 65001` (Windows) or use a modern terminal |
 | `Option '--profile' requires an argument` | You pressed Enter too early. Run `--profile=discovery` on the same line |
 | `ds` is not recognized | Make sure you're in the project folder, or use the full path `.\.venv\Scripts\ds.exe` |
@@ -708,7 +708,7 @@ pyagentt_cli/
   scoring.py      - 8-component scoring engine
   models.py       - Data models (PairSnapshot, HotTokenCandidate)
   holders.py      - Multi-provider holder count fetching
-  client.py       - PyAgentT API client with rate limiting
+  client.py       - AgentPyT API client with rate limiting
   config.py       - Constants and filter defaults
   state.py        - Preset/task persistence (JSON files)
   mcp_server.py   - MCP server exposing all tools

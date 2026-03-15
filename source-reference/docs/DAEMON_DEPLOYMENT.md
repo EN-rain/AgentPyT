@@ -9,7 +9,7 @@ File: `/etc/systemd/system/pyagentt-task-daemon.service`
 
 ```ini
 [Unit]
-Description=PyAgentT Task Daemon
+Description=AgentPyT Task Daemon
 After=network-online.target
 Wants=network-online.target
 

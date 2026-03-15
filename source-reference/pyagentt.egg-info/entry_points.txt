@@ -1,5 +1,0 @@
-[console_scripts]
-ds = pyagentt_cli.cli:app
-pyagentt = pyagentt_cli.cli:app
-pyagentt-mcp = pyagentt_cli.mcp_server:main
-pyagentt-web = pyagentt_cli.web_api:main

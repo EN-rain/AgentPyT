@@ -388,7 +388,7 @@ async def _dispatch_channels(
                     "content": f"[{'TEST' if is_test else 'ALERT'}] {task.name}",
                     "embeds": [
                         {
-                            "title": "PyAgentT Signal",
+                            "title": "AgentPyT Signal",
                             "description": message[:3000],
                             "color": 3066993 if not is_test else 3447003,
                             "fields": fields,

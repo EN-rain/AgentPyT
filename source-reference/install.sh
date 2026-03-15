@@ -3,7 +3,7 @@ set -e
 
 echo ""
 echo "  ===================================="
-echo "   PyAgentT - Quick Install"
+echo "   AgentPyT - Quick Install"
 echo "  ===================================="
 echo ""
 

@@ -1,4 +1,4 @@
-"""PyAgentT CLI + MCP + Web tool."""
+"""AgentPyT CLI + MCP + Web tool."""
 
 __all__ = ["__version__"]
 

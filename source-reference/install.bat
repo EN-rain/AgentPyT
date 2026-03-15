@@ -2,7 +2,7 @@
 chcp 65001 >nul
 echo.
 echo  ====================================
-echo   PyAgentT - Quick Install
+echo   AgentPyT - Quick Install
 echo  ====================================
 echo.
 

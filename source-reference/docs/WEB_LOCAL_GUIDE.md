@@ -1,4 +1,4 @@
-# PyAgentT Web Local Guide
+# AgentPyT Web Local Guide
 
 This project now includes a local React website that recreates the CLI + MCP workflow in browser form.
 

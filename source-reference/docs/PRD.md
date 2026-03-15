@@ -1,25 +1,25 @@
 # Product Requirements Document (PRD)
 
 ## Product
-`PyAgentT`
+`AgentPyT`
 
 ## Date
 March 3, 2026
 
 ## Problem Statement
-Traders use PyAgentT to find early momentum and chain-specific breakout tokens, but doing this through browser tabs is slow, noisy, and hard to automate.
+Traders use AgentPyT to find early momentum and chain-specific breakout tokens, but doing this through browser tabs is slow, noisy, and hard to automate.
 
 ## Goals
 1. Let users discover hot tokens by chain directly in terminal.
 2. Provide an operator-grade visual interface for fast scan/read/act workflows.
 3. Expose the same intelligence through MCP for agent automation.
-4. Stay compliant with PyAgentT public API rate limits.
+4. Stay compliant with AgentPyT public API rate limits.
 5. Add a reusable task system for repeatable scan setups.
 
 ## Non-Goals
 1. Trade execution and wallet signing.
 2. Guaranteed alpha/risk prediction.
-3. True holder-level distribution analytics from PyAgentT (not available in public API).
+3. True holder-level distribution analytics from AgentPyT (not available in public API).
 
 ## Target Users
 1. Meme/altcoin momentum traders.
@@ -56,13 +56,13 @@ Traders use PyAgentT to find early momentum and chain-specific breakout tokens, 
    - Add tools for presets/tasks execution.
 
 ## Non-Functional Requirements
-1. Respect PyAgentT rate classes (60 rpm / 300 rpm).
+1. Respect AgentPyT rate classes (60 rpm / 300 rpm).
 2. Caching and retry/backoff for reliability.
 3. Works locally without paid API keys.
 4. Clean terminal rendering in standard Windows/Linux terminals.
 
 ## Data Constraints
-1. Public PyAgentT API does not expose holder distribution tables.
+1. Public AgentPyT API does not expose holder distribution tables.
 2. Distribution view must be explicitly heuristic/proxy-based.
 
 ## Success Metrics

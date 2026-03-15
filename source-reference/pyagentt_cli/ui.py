@@ -16,7 +16,7 @@ from .models import HotTokenCandidate, PairSnapshot
 from .scoring import build_distribution_heuristics
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# PyAgentT-inspired color palette
+# AgentPyT-inspired color palette
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # Core palette - dark backgrounds, muted borders, punchy data colors
@@ -1419,9 +1419,9 @@ def render_inspect_view(
         )
         table.add_row("Status", Text(status, style=status_style))
 
-    # -- PyAgentT link --
+    # -- AgentPyT link --
     if pair.pair_url:
-        table.add_row("PyAgentT", Text(_safe_text(pair.pair_url), style=f"{C_BLUE} underline"))
+        table.add_row("AgentPyT", Text(_safe_text(pair.pair_url), style=f"{C_BLUE} underline"))
 
     # -- Extra pairs hint --
     if extra_pairs > 0:

@@ -1,7 +1,7 @@
 [project]
 name = "pyagentt"
 version = "0.1.0"
-description = "PyAgentT - PyAgentT-powered scanner with CLI, MCP, and local React web dashboard"
+description = "AgentPyT - AgentPyT-powered scanner with CLI, MCP, and local React web dashboard"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "vibeforge1111" }]

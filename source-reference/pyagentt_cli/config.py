@@ -13,7 +13,7 @@ RATE_LIMITS_RPM: Final[dict[str, int]] = {
     "fast": 300,
 }
 
-# Default cache tuned to PyAgentT's documented free limits:
+# Default cache tuned to AgentPyT's documented free limits:
 # - slow bucket: 4 discovery endpoints / 10s ~= 24 rpm under the 60 rpm cap
 # - fast bucket: ~27 search calls + a handful of pair fetches / 10s stays well
 #   under the 300 rpm cap for the live watch workflows in this repo

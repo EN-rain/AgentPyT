@@ -1,0 +1,11 @@
+{
+  "name": "pyagentt",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgentPyT - Token Scanner with CLI, MCP, and local React web dashboard",
+  "scripts": {
+    "dev": "node dev.mjs",
+    "dev:backend": "node -e \"const { spawn } = require('child_process'); const p = spawn('.venv/Scripts/python.exe', ['-m', 'uvicorn', 'pyagentt_cli.web_api:app', '--host', '127.0.0.1', '--port', '8765', '--reload'], { stdio: 'inherit', shell: true }); p.on('close', c => process.exit(c));\"",
+    "install:python": "install.bat"
+  }
+}

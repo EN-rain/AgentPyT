@@ -294,11 +294,11 @@ async def scan_hot_tokens(
     min_txns_h1: int = 30,
     min_price_change_h1: float = -10.0,
 ) -> list[dict[str, Any]]:
-    """Scan and rank the hottest tokens on PyAgentT right now.
+    """Scan and rank the hottest tokens on AgentPyT right now.
 
-    Discovers tokens from PyAgentT boosts and profiles, scores them by volume,
+    Discovers tokens from AgentPyT boosts and profiles, scores them by volume,
     liquidity, momentum, and flow pressure, then returns ranked results.
-    All data comes from free public APIs (PyAgentT, GeckoTerminal, Blockscout, Honeypot.is).
+    All data comes from free public APIs (AgentPyT, GeckoTerminal, Blockscout, Honeypot.is).
 
     Use this when a user asks: "what's hot", "show me trending tokens",
     "find tokens on solana", "what should I look at", "find degen plays", etc.
@@ -743,7 +743,7 @@ async def import_state_bundle(bundle: dict[str, Any], mode: str = "merge") -> di
 
 @mcp.tool()
 async def search_pairs(query: str, limit: int = 20) -> list[dict[str, Any]]:
-    """Search for tokens on PyAgentT by name, symbol, or contract address.
+    """Search for tokens on AgentPyT by name, symbol, or contract address.
 
     Use this when a user asks "find pepe", "search for <token>",
     "look up this address", etc. Returns matching pairs with price,
@@ -812,7 +812,7 @@ async def inspect_token(chain_id: str, token_address: str) -> dict[str, Any]:
             },
             "distributionProxy": build_distribution_heuristics(candidate),
             "note": (
-                "PyAgentT public API does not expose holder-level ownership tables. "
+                "AgentPyT public API does not expose holder-level ownership tables. "
                 "Use holdersCount/holdersSource when available."
             ),
             "additionalPairCount": max(len(pairs) - 1, 0),
@@ -917,7 +917,7 @@ def prompt_alpha_scan_plan(
     selected_profile = profile if profile in SCAN_PROFILE_NAMES else "balanced"
     baseline = SCAN_PROFILE_BASELINES[selected_profile]
     return (
-        "Build an execution-first scan plan for PyAgentT.\n"
+        "Build an execution-first scan plan for AgentPyT.\n"
         f"Objective: {objective}\n"
         f"Chains: {chains}\n"
         f"Profile: {selected_profile}\n"
@@ -965,7 +965,7 @@ def prompt_cli_quickstart_guide(
     selected_goal = _quickstart_goal(goal)
     commands = "\n".join(f"- {command}" for command in _quickstart_commands(selected_platform, selected_goal))
     return (
-        "Give a zero-assumption quickstart for PyAgentT.\n"
+        "Give a zero-assumption quickstart for AgentPyT.\n"
         f"Platform: {selected_platform}\n"
         f"Goal: {selected_goal}\n"
         "Return:\n"

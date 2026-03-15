@@ -77,7 +77,7 @@ from .watch_controls import WatchKeyboardController, copy_to_clipboard
 
 app = typer.Typer(
     add_completion=False,
-    help="PyAgentT scanner CLI. Spot hot runners and inspect pair flow from the terminal.",
+    help="AgentPyT scanner CLI. Spot hot runners and inspect pair flow from the terminal.",
 )
 preset_app = typer.Typer(help="Save and reuse named scan filter presets.")
 task_app = typer.Typer(help="Manage repeatable scan tasks.")
@@ -1112,7 +1112,7 @@ def setup() -> None:
     console.print()
     console.print(
         Panel(
-            "[bold]Welcome to the PyAgentT setup wizard.[/bold]\n"
+            "[bold]Welcome to the AgentPyT setup wizard.[/bold]\n"
             "Answer 5 quick questions to calibrate your scanner.\n"
             "Your settings are saved and auto-loaded on every scan.",
             border_style=C_BORDER,
@@ -1266,7 +1266,7 @@ def update(
             console.print("[dim]Update cancelled.[/dim]")
             raise typer.Exit()
 
-    console.print("[bold]Updating PyAgentT...[/bold]\n")
+    console.print("[bold]Updating AgentPyT...[/bold]\n")
 
     # Git pull
     try:
@@ -1337,9 +1337,9 @@ def doctor() -> None:
     import httpx as _httpx
     try:
         resp = _httpx.get("https://api.dexscreener.com/token-boosts/top/v1", timeout=10, follow_redirects=False)
-        checks.append(("PyAgentT API", resp.status_code == 200, f"HTTP {resp.status_code}"))
+        checks.append(("AgentPyT API", resp.status_code == 200, f"HTTP {resp.status_code}"))
     except Exception as exc:
-        checks.append(("PyAgentT API", False, str(exc)[:60]))
+        checks.append(("AgentPyT API", False, str(exc)[:60]))
 
     # 4. Environment variables
     import os
@@ -2121,7 +2121,7 @@ def search(
     limit: Annotated[int, typer.Option(help="Max result rows")] = 20,
     as_json: Annotated[bool, typer.Option("--json", help="Output machine-readable JSON")] = False,
 ) -> None:
-    """Search across PyAgentT pairs."""
+    """Search across AgentPyT pairs."""
 
     async def run_search() -> None:
         async with DexScreenerClient() as client:
@@ -2150,7 +2150,7 @@ def god_prompt() -> None:
 
 @app.command("why")
 def why() -> None:
-    """Explain why PyAgentT is used and what this CLI optimizes."""
+    """Explain why AgentPyT is used and what this CLI optimizes."""
     payload = {
         "top_use_cases": [
             "Fast discovery of active pools and cross-chain momentum.",
