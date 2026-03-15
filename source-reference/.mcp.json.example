@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pyagentt": {
+      "command": "C:\\\\path\\\\to\\\\PyAgentT\\\\.venv\\\\Scripts\\\\pyagentt-mcp.exe",
+      "args": []
+    }
+  }
+}

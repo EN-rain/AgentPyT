@@ -1,0 +1,7 @@
+[console_scripts]
+dexscreener-mcp = dexscreener_cli.mcp_server:main
+dexscreener-web = dexscreener_cli.web_api:main
+ds = dexscreener_cli.cli:app
+pyagentt = dexscreener_cli.cli:app
+pyagentt-mcp = dexscreener_cli.mcp_server:main
+pyagentt-web = dexscreener_cli.web_api:main
