@@ -1,1 +1,1 @@
-dexscreener_cli
+pyagentt_cli

@@ -253,223 +253,278 @@ function App() {
     };
   }, []);
 
+  const resultCount = results.length;
+
   return (
-    <>
-      <main className="layout">
-        <header className="hero">
-          <div>
-            <p className="overline">PyAgentT - CLI + React local terminal dashboard</p>
-            <h1>PyAgentT Local Scanner</h1>
-            <p className="muted">Hot scans, live watch, presets, and tasks in a plain terminal-style interface.</p>
-          </div>
-          <div className="status-box">
-            <span className={`pill ${healthPill.className}`}>{healthPill.text}</span>
-            <span className={`pill ${watchPill.className}`}>{watchPill.text}</span>
-          </div>
-        </header>
+    <main className="app-shell">
+      <header className="topbar">
+        <div>
+          <h1>PyAgentT Scanner</h1>
+          <p className="muted">Local workspace for scans, watch streams, presets, and scheduled runs.</p>
+        </div>
+        <div className="topbar-meta">
+          <span className={`status-chip ${healthPill.className}`}>{healthPill.text}</span>
+          <span className={`status-chip ${watchPill.className}`}>{watchPill.text}</span>
+        </div>
+      </header>
 
-        <section className="controls">
-          <h2>Scan Controls</h2>
-          <div className="grid controls-grid">
-            <label>Chains
-              <div className="checks">
-                {ALL_CHAINS.map((chain) => (
-                  <label key={chain}>
-                    <input
-                      type="checkbox"
-                      checked={chainChecks[chain]}
-                      onChange={(event) => setChainChecks((prev) => ({ ...prev, [chain]: event.target.checked }))}
-                    />
-                    {chain}
-                  </label>
-                ))}
+      <div className="workspace">
+        <aside className="sidebar panel">
+          <div className="panel-section">
+              <div className="section-header">
+                <h2>Filters</h2>
               </div>
-            </label>
-            <label>Profile
-              <select value={profile} onChange={(event) => setProfile(event.target.value)}>
-                <option value="">custom</option>
-                <option value="discovery">discovery</option>
-                <option value="balanced">balanced</option>
-                <option value="strict">strict</option>
-              </select>
-            </label>
-            <label>Preset
-              <input value={preset} onChange={(event) => setPreset(event.target.value)} type="text" placeholder="optional preset name" />
-            </label>
-            <label>Limit
-              <input value={limit} onChange={(event) => setLimit(event.target.value)} type="number" min="1" max="100" />
-            </label>
-            <label>Min Liquidity USD
-              <input value={minLiq} onChange={(event) => setMinLiq(event.target.value)} type="number" min="0" />
-            </label>
-            <label>Min Volume 24h USD
-              <input value={minVol} onChange={(event) => setMinVol(event.target.value)} type="number" min="0" />
-            </label>
-            <label>Min Txns 1h
-              <input value={minTx} onChange={(event) => setMinTx(event.target.value)} type="number" min="0" />
-            </label>
-            <label>Min Price Change 1h (%)
-              <input value={minPct} onChange={(event) => setMinPct(event.target.value)} type="number" />
-            </label>
-            <label>Watch Interval (s)
-              <input value={watchInterval} onChange={(event) => setWatchInterval(event.target.value)} type="number" min="2" max="120" />
-            </label>
+              <div className="field-grid single">
+                <label>Chains</label>
+                <div className="checks">
+                  {ALL_CHAINS.map((chain) => (
+                    <label key={chain} className="check-item">
+                      <input
+                        type="checkbox"
+                        checked={chainChecks[chain]}
+                        onChange={(event) => setChainChecks((prev) => ({ ...prev, [chain]: event.target.checked }))}
+                      />
+                      <span>{chain}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="field-grid filter-grid">
+                <label>
+                  Profile
+                  <div className="select-wrap">
+                    <select value={profile} onChange={(event) => setProfile(event.target.value)}>
+                      <option value="">custom</option>
+                      <option value="discovery">discovery</option>
+                      <option value="balanced">balanced</option>
+                      <option value="strict">strict</option>
+                    </select>
+                  </div>
+                </label>
+                <label>
+                  Preset
+                  <input value={preset} onChange={(event) => setPreset(event.target.value)} type="text" placeholder="optional preset name" />
+                </label>
+                <label>
+                  Result limit
+                  <input value={limit} onChange={(event) => setLimit(event.target.value)} type="number" min="1" max="100" />
+                </label>
+                <label>
+                  Watch interval
+                  <input value={watchInterval} onChange={(event) => setWatchInterval(event.target.value)} type="number" min="2" max="120" />
+                </label>
+                <label>
+                  Min liquidity USD
+                  <input value={minLiq} onChange={(event) => setMinLiq(event.target.value)} type="number" min="0" />
+                </label>
+                <label>
+                  Min volume 24h USD
+                  <input value={minVol} onChange={(event) => setMinVol(event.target.value)} type="number" min="0" />
+                </label>
+                <label>
+                  Min txns 1h
+                  <input value={minTx} onChange={(event) => setMinTx(event.target.value)} type="number" min="0" />
+                </label>
+                <label>
+                  Min price change 1h
+                  <input value={minPct} onChange={(event) => setMinPct(event.target.value)} type="number" />
+                </label>
+              </div>
+              <div className="button-row">
+                <button className="primary" onClick={() => runAction(runScan)}>Run scan</button>
+                <button onClick={() => runAction(startWatch)}>Start watch</button>
+                <button className="danger" onClick={stopWatch}>Stop watch</button>
+              </div>
           </div>
-          <div className="actions">
-            <button className="primary" onClick={() => runAction(runScan)}>Run Scan</button>
-            <button onClick={() => runAction(startWatch)}>Start Live Watch</button>
-            <button className="danger" onClick={stopWatch}>Stop Watch</button>
-          </div>
-        </section>
 
-        <section className="results">
-          <div className="section-head">
-            <h2>Results</h2>
-            <span className="mono muted">{scanMeta}</span>
+          <div className="panel-section summary-list">
+            <div className="summary-row">
+              <span>Selected chains</span>
+              <strong>{selectedChains.length}</strong>
+            </div>
+            <div className="summary-row">
+              <span>Loaded presets</span>
+              <strong>{presets.length}</strong>
+            </div>
+            <div className="summary-row">
+              <span>Scheduled tasks</span>
+              <strong>{tasks.length}</strong>
+            </div>
+            <div className="summary-row">
+              <span>Visible results</span>
+              <strong>{resultCount}</strong>
+            </div>
           </div>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Token</th>
-                  <th>Chain</th>
-                  <th>Score</th>
-                  <th>Price</th>
-                  <th>1h%</th>
-                  <th>Volume 24h</th>
-                  <th>Liquidity</th>
-                  <th>Txns 1h</th>
-                  <th>Tags</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.length === 0 ? (
+        </aside>
+
+        <section className="content">
+          <section className="panel">
+            <div className="results-header">
+              <div className="section-header no-margin">
+                <div>
+                  <h2>Results</h2>
+                  <p className="muted meta-line">{scanMeta}</p>
+                </div>
+              </div>
+              <div className="results-summary muted mono">
+                <span>{resultCount} rows</span>
+                <span>{selectedChains.join(" | ")}</span>
+              </div>
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
                   <tr>
-                    <td colSpan="10" className="muted">No scan results yet.</td>
+                    <th>#</th>
+                    <th>Token</th>
+                    <th>Chain</th>
+                    <th>Score</th>
+                    <th>Price</th>
+                    <th>1h</th>
+                    <th>Volume 24h</th>
+                    <th>Liquidity</th>
+                    <th>Txns 1h</th>
+                    <th>Tags</th>
                   </tr>
-                ) : (
-                  results.map((row, idx) => (
-                    <tr key={`${row.chainId}:${row.tokenAddress}:${idx}`}>
-                      <td>{idx + 1}</td>
-                      <td className="token-cell">
-                        <strong>{row.tokenSymbol || "?"}</strong>
-                        <span className="muted mono">{row.tokenAddress}</span>
-                      </td>
-                      <td>{row.chainId}</td>
-                      <td className={row.score >= 70 ? "score-good" : row.score < 40 ? "score-bad" : ""}>{Number(row.score || 0).toFixed(2)}</td>
-                      <td>{formatPrice(row.priceUsd)}</td>
-                      <td>{Number(row.priceChangeH1 || 0).toFixed(2)}%</td>
-                      <td>{money(row.volumeH24)}</td>
-                      <td>{money(row.liquidityUsd)}</td>
-                      <td>{row.txnsH1 || 0}</td>
-                      <td>{(row.tags || []).join(", ")}</td>
+                </thead>
+                <tbody>
+                  {results.length === 0 ? (
+                    <tr>
+                      <td colSpan="10" className="empty-cell">No scan results yet.</td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    results.map((row, idx) => (
+                      <tr key={`${row.chainId}:${row.tokenAddress}:${idx}`}>
+                        <td>{idx + 1}</td>
+                        <td className="token-cell">
+                          <strong>{row.tokenSymbol || "?"}</strong>
+                          <span className="muted mono">{row.tokenAddress}</span>
+                        </td>
+                        <td>{row.chainId}</td>
+                        <td className={row.score >= 70 ? "score-good" : row.score < 40 ? "score-bad" : ""}>{Number(row.score || 0).toFixed(2)}</td>
+                        <td>{formatPrice(row.priceUsd)}</td>
+                        <td>{Number(row.priceChangeH1 || 0).toFixed(2)}%</td>
+                        <td>{money(row.volumeH24)}</td>
+                        <td>{money(row.liquidityUsd)}</td>
+                        <td>{row.txnsH1 || 0}</td>
+                        <td>{(row.tags || []).join(", ") || "-"}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <div className="content-grid">
+            <section className="panel">
+              <div className="section-header">
+                <h2>Search</h2>
+              </div>
+              <div className="inline-form">
+                <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} type="text" placeholder="pepe or token address" />
+                <button onClick={() => runAction(runSearch)}>Search</button>
+              </div>
+              {searchResults.length === 0 ? (
+                <p className="empty-state">No search results yet.</p>
+              ) : (
+                <div className="list">
+                  {searchResults.map((row, idx) => (
+                    <div className="list-item" key={`${row.chainId}:${row.tokenAddress}:${idx}`}>
+                      <div>
+                        <strong>{row.tokenSymbol}</strong>
+                        <div className="muted mono">{row.chainId} | {row.tokenAddress}</div>
+                      </div>
+                      <div className="list-metric mono">{money(row.volumeH24)} / {money(row.liquidityUsd)}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="panel">
+              <div className="section-header">
+                <h2>Inspect</h2>
+              </div>
+              <div className="inline-form">
+                <div className="select-wrap">
+                  <select value={inspectChain} onChange={(event) => setInspectChain(event.target.value)}>
+                    {ALL_CHAINS.map((chain) => (
+                      <option key={chain} value={chain}>{chain}</option>
+                    ))}
+                  </select>
+                </div>
+                <input value={inspectAddress} onChange={(event) => setInspectAddress(event.target.value)} type="text" placeholder="token address" />
+                <button onClick={() => runAction(runInspect)}>Inspect</button>
+              </div>
+              {inspectOutput ? (
+                <pre className="mono pre">{inspectOutput}</pre>
+              ) : (
+                <p className="empty-state">No inspect output yet.</p>
+              )}
+            </section>
+
+            <section className="panel">
+              <div className="section-header">
+                <h2>Presets</h2>
+              </div>
+              <div className="inline-form">
+                <input value={presetName} onChange={(event) => setPresetName(event.target.value)} type="text" placeholder="new preset name" />
+                <button onClick={() => runAction(savePreset)}>Save current filters</button>
+              </div>
+              {presets.length === 0 ? (
+                <p className="empty-state">No presets saved.</p>
+              ) : (
+                <div className="list">
+                  {presets.map((item) => (
+                    <div className="list-item" key={item.name}>
+                      <div>
+                        <strong>{item.name}</strong>
+                        <div className="muted mono">{(item.chains || []).join(", ")} | limit {item.limit}</div>
+                      </div>
+                      <button onClick={() => runAction(() => deletePreset(item.name))}>Delete</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="panel">
+              <div className="section-header">
+                <h2>Tasks</h2>
+              </div>
+              <div className="inline-form">
+                <input value={taskName} onChange={(event) => setTaskName(event.target.value)} type="text" placeholder="task name" />
+                <input value={taskInterval} onChange={(event) => setTaskInterval(event.target.value)} type="number" min="15" />
+                <button onClick={() => runAction(createTask)}>Create task</button>
+              </div>
+              <div className="inline-form compact-actions">
+                <button onClick={() => runAction(runDueTasks)}>Run due tasks</button>
+                <button onClick={() => runAction(loadTasks)}>Refresh</button>
+              </div>
+              {tasks.length === 0 ? (
+                <p className="empty-state">No tasks created.</p>
+              ) : (
+                <div className="list">
+                  {tasks.map((item) => (
+                    <div className="list-item" key={item.id}>
+                      <div>
+                        <strong>{item.name}</strong>
+                        <div className="muted mono">{item.status} | every {item.interval_seconds || 120}s | preset {item.preset || "-"}</div>
+                      </div>
+                      <div className="button-row compact">
+                        <button onClick={() => runAction(() => runTask(item.id))}>Run</button>
+                        <button onClick={() => runAction(() => deleteTask(item.id))}>Delete</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         </section>
-
-        <section className="grid split">
-          <article className="search-panel">
-            <h2>Search</h2>
-            <div className="inline-form">
-              <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} type="text" placeholder="pepe or token address" />
-              <button onClick={() => runAction(runSearch)}>Search</button>
-            </div>
-            {searchResults.length === 0 ? (
-              <p className="muted empty-line">No search results yet.</p>
-            ) : (
-              <div className="list">
-                {searchResults.map((row, idx) => (
-                  <div className="list-item" key={`${row.chainId}:${row.tokenAddress}:${idx}`}>
-                    <div>
-                      <strong>{row.tokenSymbol}</strong> <span className="muted">({row.chainId})</span>
-                      <div className="mono muted">{row.tokenAddress}</div>
-                    </div>
-                    <div className="mono">{money(row.volumeH24)} / {money(row.liquidityUsd)}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </article>
-          <article className="inspect-panel">
-            <h2>Inspect</h2>
-            <div className="inline-form">
-              <select value={inspectChain} onChange={(event) => setInspectChain(event.target.value)}>
-                {ALL_CHAINS.map((chain) => (
-                  <option key={chain} value={chain}>{chain}</option>
-                ))}
-              </select>
-              <input value={inspectAddress} onChange={(event) => setInspectAddress(event.target.value)} type="text" placeholder="token address" />
-              <button onClick={() => runAction(runInspect)}>Inspect</button>
-            </div>
-            {inspectOutput ? (
-              <pre className="mono pre">{inspectOutput}</pre>
-            ) : (
-              <p className="muted empty-line">No inspect output yet.</p>
-            )}
-          </article>
-        </section>
-
-        <section className="grid split">
-          <article className="presets-panel">
-            <h2>Presets</h2>
-            <div className="inline-form">
-              <input value={presetName} onChange={(event) => setPresetName(event.target.value)} type="text" placeholder="new preset name" />
-              <button onClick={() => runAction(savePreset)}>Save Current Filters</button>
-            </div>
-            {presets.length === 0 ? (
-              <p className="muted empty-line">No presets saved.</p>
-            ) : (
-              <div className="list">
-                {presets.map((item) => (
-                  <div className="list-item" key={item.name}>
-                    <div>
-                      <strong>{item.name}</strong>
-                      <div className="muted mono">{(item.chains || []).join(", ")} | limit {item.limit}</div>
-                    </div>
-                    <button onClick={() => runAction(() => deletePreset(item.name))}>Delete</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </article>
-          <article className="tasks-panel">
-            <h2>Tasks</h2>
-            <div className="inline-form">
-              <input value={taskName} onChange={(event) => setTaskName(event.target.value)} type="text" placeholder="task name" />
-              <input value={taskInterval} onChange={(event) => setTaskInterval(event.target.value)} type="number" min="15" />
-              <button onClick={() => runAction(createTask)}>Create</button>
-            </div>
-            <div className="inline-form">
-              <button onClick={() => runAction(runDueTasks)}>Run Due Tasks</button>
-              <button onClick={() => runAction(loadTasks)}>Refresh Tasks</button>
-            </div>
-            {tasks.length === 0 ? (
-              <p className="muted empty-line">No tasks created.</p>
-            ) : (
-              <div className="list">
-                {tasks.map((item) => (
-                  <div className="list-item" key={item.id}>
-                    <div>
-                      <strong>{item.name}</strong>
-                      <div className="muted mono">{item.status} | every {item.interval_seconds || 120}s | preset {item.preset || "-"}</div>
-                    </div>
-                    <div className="actions">
-                      <button onClick={() => runAction(() => runTask(item.id))}>Run</button>
-                      <button onClick={() => runAction(() => deleteTask(item.id))}>Delete</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </article>
-        </section>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }
 

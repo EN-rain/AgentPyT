@@ -1336,7 +1336,7 @@ def doctor() -> None:
     # 3. API connectivity
     import httpx as _httpx
     try:
-        resp = _httpx.get("https://api.pyagentt.com/token-boosts/top/v1", timeout=10, follow_redirects=False)
+        resp = _httpx.get("https://api.dexscreener.com/token-boosts/top/v1", timeout=10, follow_redirects=False)
         checks.append(("PyAgentT API", resp.status_code == 200, f"HTTP {resp.status_code}"))
     except Exception as exc:
         checks.append(("PyAgentT API", False, str(exc)[:60]))

@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass
 from typing import Final
 
-API_BASE: Final[str] = "https://api.pyagentt.com"
+API_BASE: Final[str] = "https://api.dexscreener.com"
 
 DEFAULT_CHAINS: Final[tuple[str, ...]] = ("solana", "base", "ethereum", "bsc")
 

@@ -13,7 +13,7 @@ def _make_pair(**overrides: object) -> PairSnapshot:
         chain_id="solana",
         dex_id="raydium",
         pair_address="PAIR1",
-        pair_url="https://pyagentt.com/solana/PAIR1",
+        pair_url="https://dexscreener.com/solana/PAIR1",
         base_address="TOKEN1",
         base_symbol="TEST",
         base_name="Test Token",

@@ -513,7 +513,7 @@ Everything works out of the box with zero API keys. You can optionally add keys 
 
 | API | What it provides | Rate Limit |
 |-----|-----------------|------------|
-| [PyAgentT](https://docs.pyagentt.com/) | All token/pair data, prices, volume, liquidity, boosts, profiles | 60-300 rpm |
+| [PyAgentT](https://docs.dexscreener.com/) | All token/pair data, prices, volume, liquidity, boosts, profiles | 60-300 rpm |
 | [GeckoTerminal](https://www.geckoterminal.com/) | Holder counts, trending pools, new token discovery | Free tier |
 | [Blockscout](https://docs.blockscout.com/) | Holder counts for Ethereum and Base | Unlimited |
 | [Honeypot.is](https://honeypot.is/) | Holder counts for all EVM chains | Free tier |

@@ -9,7 +9,7 @@ def test_pair_snapshot_from_api_handles_non_dict_nested_payloads() -> None:
             "chainId": "solana",
             "dexId": "raydium",
             "pairAddress": "PAIR1",
-            "url": "https://pyagentt.com/solana/PAIR1",
+            "url": "https://dexscreener.com/solana/PAIR1",
             "baseToken": "bad",
             "quoteToken": None,
             "txns": "bad",
