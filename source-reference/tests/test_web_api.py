@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from dexscreener_cli import web_api
-from dexscreener_cli.web_runtime import WebRuntime as RealWebRuntime
+from pyagentt_cli import web_api
+from pyagentt_cli.web_runtime import WebRuntime as RealWebRuntime
 
 
 @pytest.fixture()

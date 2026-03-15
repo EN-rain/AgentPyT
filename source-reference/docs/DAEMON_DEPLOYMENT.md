@@ -5,19 +5,19 @@ This guide shows how to run task scheduling continuously.
 ## Linux (systemd)
 
 ## 1) Create a service unit
-File: `/etc/systemd/system/dexscreener-task-daemon.service`
+File: `/etc/systemd/system/pyagentt-task-daemon.service`
 
 ```ini
 [Unit]
-Description=Dexscreener Task Daemon
+Description=PyAgentT Task Daemon
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=YOUR_USER
-WorkingDirectory=/path/to/dexscreener-cli-mcp-tool
-ExecStart=/path/to/dexscreener-cli-mcp-tool/.venv/bin/ds task daemon --all --poll-seconds 5 --default-interval-seconds 120
+WorkingDirectory=/path/to/pyagentt-cli-mcp-tool
+ExecStart=/path/to/pyagentt-cli-mcp-tool/.venv/bin/ds task daemon --all --poll-seconds 5 --default-interval-seconds 120
 Restart=always
 RestartSec=3
 Environment=PYTHONUNBUFFERED=1
@@ -29,20 +29,20 @@ WantedBy=multi-user.target
 ## 2) Enable and start
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable dexscreener-task-daemon
-sudo systemctl start dexscreener-task-daemon
+sudo systemctl enable pyagentt-task-daemon
+sudo systemctl start pyagentt-task-daemon
 ```
 
 ## 3) Inspect logs
 ```bash
-sudo journalctl -u dexscreener-task-daemon -f
+sudo journalctl -u pyagentt-task-daemon -f
 ```
 
 ## Windows (Task Scheduler)
 
 ## 1) Program/script
 Use:
-`C:\path\to\dexscreener-cli-mcp-tool\.venv\Scripts\ds.exe`
+`C:\path\to\pyagentt-cli-mcp-tool\.venv\Scripts\ds.exe`
 
 ## 2) Arguments
 Use:
@@ -50,7 +50,7 @@ Use:
 
 ## 3) Start in
 Use:
-`C:\path\to\dexscreener-cli-mcp-tool`
+`C:\path\to\pyagentt-cli-mcp-tool`
 
 ## 4) Trigger
 1. At startup, or

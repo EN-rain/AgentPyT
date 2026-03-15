@@ -1,17 +1,17 @@
 # System Architecture
 
 ## High-Level Components
-1. CLI Layer (`dexscreener_cli/cli.py`)
-2. MCP Layer (`dexscreener_cli/mcp_server.py`)
-3. Scanner Orchestration (`dexscreener_cli/scanner.py`)
-4. API Client + Rate Limiter (`dexscreener_cli/client.py`)
-5. Scoring Engine (`dexscreener_cli/scoring.py`)
-6. UI Rendering (`dexscreener_cli/ui.py`)
+1. CLI Layer (`pyagentt_cli/cli.py`)
+2. MCP Layer (`pyagentt_cli/mcp_server.py`)
+3. Scanner Orchestration (`pyagentt_cli/scanner.py`)
+4. API Client + Rate Limiter (`pyagentt_cli/client.py`)
+5. Scoring Engine (`pyagentt_cli/scoring.py`)
+6. UI Rendering (`pyagentt_cli/ui.py`)
 7. Local State (new): presets/tasks store
 
 ## Flow Overview
 1. User calls CLI or MCP tool.
-2. Scanner requests discovery seeds from Dexscreener slow endpoints.
+2. Scanner requests discovery seeds from PyAgentT slow endpoints.
 3. Scanner expands tokens to pairs via fast endpoints.
 4. Scoring engine ranks candidates.
 5. UI or JSON serializer returns output.

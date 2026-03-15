@@ -294,11 +294,11 @@ async def scan_hot_tokens(
     min_txns_h1: int = 30,
     min_price_change_h1: float = -10.0,
 ) -> list[dict[str, Any]]:
-    """Scan and rank the hottest tokens on Dexscreener right now.
+    """Scan and rank the hottest tokens on PyAgentT right now.
 
-    Discovers tokens from Dexscreener boosts and profiles, scores them by volume,
+    Discovers tokens from PyAgentT boosts and profiles, scores them by volume,
     liquidity, momentum, and flow pressure, then returns ranked results.
-    All data comes from free public APIs (Dexscreener, GeckoTerminal, Blockscout, Honeypot.is).
+    All data comes from free public APIs (PyAgentT, GeckoTerminal, Blockscout, Honeypot.is).
 
     Use this when a user asks: "what's hot", "show me trending tokens",
     "find tokens on solana", "what should I look at", "find degen plays", etc.
@@ -743,7 +743,7 @@ async def import_state_bundle(bundle: dict[str, Any], mode: str = "merge") -> di
 
 @mcp.tool()
 async def search_pairs(query: str, limit: int = 20) -> list[dict[str, Any]]:
-    """Search for tokens on Dexscreener by name, symbol, or contract address.
+    """Search for tokens on PyAgentT by name, symbol, or contract address.
 
     Use this when a user asks "find pepe", "search for <token>",
     "look up this address", etc. Returns matching pairs with price,
@@ -812,7 +812,7 @@ async def inspect_token(chain_id: str, token_address: str) -> dict[str, Any]:
             },
             "distributionProxy": build_distribution_heuristics(candidate),
             "note": (
-                "Dexscreener public API does not expose holder-level ownership tables. "
+                "PyAgentT public API does not expose holder-level ownership tables. "
                 "Use holdersCount/holdersSource when available."
             ),
             "additionalPairCount": max(len(pairs) - 1, 0),

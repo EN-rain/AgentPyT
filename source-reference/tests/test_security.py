@@ -7,19 +7,19 @@ import stat
 
 import pytest
 
-from dexscreener_cli import mcp_server
-from dexscreener_cli.alerts import (
+from pyagentt_cli import mcp_server
+from pyagentt_cli.alerts import (
     _build_delivery_target,
     _SafeTemplate,
     _sanitize_channel_error,
     validate_webhook_url,
 )
-from dexscreener_cli.cli import _build_alert_config as build_cli_alert_config
-from dexscreener_cli.client import _validate_path_segment
-from dexscreener_cli.config import ScanFilters
-from dexscreener_cli.state import ScanPreset, StateStore
-from dexscreener_cli.task_runner import _sanitize_error
-from dexscreener_cli.watch_controls import _sanitize_clipboard
+from pyagentt_cli.cli import _build_alert_config as build_cli_alert_config
+from pyagentt_cli.client import _validate_path_segment
+from pyagentt_cli.config import ScanFilters
+from pyagentt_cli.state import ScanPreset, StateStore
+from pyagentt_cli.task_runner import _sanitize_error
+from pyagentt_cli.watch_controls import _sanitize_clipboard
 
 
 class TestWebhookValidation:

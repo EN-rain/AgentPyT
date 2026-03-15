@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dexscreener_cli.models import PairSnapshot
+from pyagentt_cli.models import PairSnapshot
 
 
 def test_pair_snapshot_from_api_handles_non_dict_nested_payloads() -> None:
@@ -9,7 +9,7 @@ def test_pair_snapshot_from_api_handles_non_dict_nested_payloads() -> None:
             "chainId": "solana",
             "dexId": "raydium",
             "pairAddress": "PAIR1",
-            "url": "https://dexscreener.com/solana/PAIR1",
+            "url": "https://pyagentt.com/solana/PAIR1",
             "baseToken": "bad",
             "quoteToken": None,
             "txns": "bad",

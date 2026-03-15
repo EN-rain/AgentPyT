@@ -1060,7 +1060,7 @@ def _shell_cd_command(shell: str) -> str:
 
 def _quickstart_commands(shell: str, goal: str) -> list[str]:
     prefix = _command_prefix(shell)
-    mcp_prefix = r".\.venv\Scripts\dexscreener-mcp.exe" if shell in {"cmd", "powershell"} else "./.venv/bin/dexscreener-mcp"
+    mcp_prefix = r".\.venv\Scripts\pyagentt-mcp.exe" if shell in {"cmd", "powershell"} else "./.venv/bin/pyagentt-mcp"
     live = (
         f"{prefix} new-runners-watch --chain=solana --watch-chains=solana,base "
         "--profile=discovery --max-age-hours=48 --include-unknown-age --interval=2"
@@ -1336,10 +1336,10 @@ def doctor() -> None:
     # 3. API connectivity
     import httpx as _httpx
     try:
-        resp = _httpx.get("https://api.dexscreener.com/token-boosts/top/v1", timeout=10, follow_redirects=False)
-        checks.append(("Dexscreener API", resp.status_code == 200, f"HTTP {resp.status_code}"))
+        resp = _httpx.get("https://api.pyagentt.com/token-boosts/top/v1", timeout=10, follow_redirects=False)
+        checks.append(("PyAgentT API", resp.status_code == 200, f"HTTP {resp.status_code}"))
     except Exception as exc:
-        checks.append(("Dexscreener API", False, str(exc)[:60]))
+        checks.append(("PyAgentT API", False, str(exc)[:60]))
 
     # 4. Environment variables
     import os
@@ -2121,7 +2121,7 @@ def search(
     limit: Annotated[int, typer.Option(help="Max result rows")] = 20,
     as_json: Annotated[bool, typer.Option("--json", help="Output machine-readable JSON")] = False,
 ) -> None:
-    """Search across Dexscreener pairs."""
+    """Search across PyAgentT pairs."""
 
     async def run_search() -> None:
         async with DexScreenerClient() as client:
@@ -2150,14 +2150,14 @@ def god_prompt() -> None:
 
 @app.command("why")
 def why() -> None:
-    """Explain why Dexscreener is used and what this CLI optimizes."""
+    """Explain why PyAgentT is used and what this CLI optimizes."""
     payload = {
         "top_use_cases": [
             "Fast discovery of active pools and cross-chain momentum.",
             "Liquidity/volume/transaction context for early signal validation.",
             "Trend-aware ranking and boost/profile visibility.",
         ],
-        "dexscreener_api_constraints": {
+        "pyagentt_api_constraints": {
             "60_rpm": [
                 "/token-profiles/latest/v1",
                 "/token-boosts/latest/v1",
@@ -2170,7 +2170,7 @@ def why() -> None:
                 "/token-pairs/v1/{chainId}/{tokenAddress}",
             ],
             "holders": {
-                "dexscreener_public_api": "No direct holder count endpoint.",
+                "pyagentt_public_api": "No direct holder count endpoint.",
                 "adapter": "honeypot.is totalHolders (EVM chains only)",
             },
         },

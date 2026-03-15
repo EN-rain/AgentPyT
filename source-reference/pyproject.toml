@@ -1,7 +1,7 @@
 [project]
 name = "pyagentt"
 version = "0.1.0"
-description = "PyAgentT - Dexscreener-powered scanner with CLI, MCP, and local React web dashboard"
+description = "PyAgentT - PyAgentT-powered scanner with CLI, MCP, and local React web dashboard"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "vibeforge1111" }]
@@ -25,12 +25,12 @@ dev = [
 ]
 
 [project.scripts]
-ds = "dexscreener_cli.cli:app"
-dexscreener-mcp = "dexscreener_cli.mcp_server:main"
-dexscreener-web = "dexscreener_cli.web_api:main"
-pyagentt = "dexscreener_cli.cli:app"
-pyagentt-mcp = "dexscreener_cli.mcp_server:main"
-pyagentt-web = "dexscreener_cli.web_api:main"
+ds = "pyagentt_cli.cli:app"
+pyagentt-mcp = "pyagentt_cli.mcp_server:main"
+pyagentt-web = "pyagentt_cli.web_api:main"
+pyagentt = "pyagentt_cli.cli:app"
+pyagentt-mcp = "pyagentt_cli.mcp_server:main"
+pyagentt-web = "pyagentt_cli.web_api:main"
 
 [build-system]
 requires = ["setuptools>=78.1.1", "wheel"]
@@ -67,4 +67,4 @@ ignore = [
 "tests/**" = ["S101"]  # assert is fine in tests
 
 [tool.setuptools.packages.find]
-include = ["dexscreener_cli*"]
+include = ["pyagentt_cli*"]

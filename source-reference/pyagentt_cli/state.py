@@ -232,7 +232,7 @@ class StateStore:
             resolved_base = base_dir
         else:
             primary = Path.home() / ".pyagentt"
-            legacy = Path.home() / ".dexscreener-cli"
+            legacy = Path.home() / ".pyagentt-cli"
             resolved_base = primary
             if not primary.exists() and legacy.exists():
                 primary.mkdir(parents=True, exist_ok=True)
