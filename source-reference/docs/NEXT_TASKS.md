@@ -1,108 +1,99 @@
-# Next Build Tasks
+# Roadmap
 
-Status key: `pending` | `in_progress` | `done`
+> Upcoming features and enhancements
 
-## 1) Signal Quality - Early Runner Detection
-- Status: `done`
-- Scope:
-  - Add volatility compression metric.
-  - Add breakout readiness score.
-  - Add boost velocity signal.
-- Acceptance:
-  - New runner board shows readiness/compression fields.
-  - Scanner tags include at least one early-signal tag when criteria match.
+## ✅ Recently Completed
 
-## 2) Signal Quality - Relative Strength
-- Status: `done`
-- Scope:
-  - Compute chain baseline for 1h momentum and flow.
-  - Add per-token relative strength vs chain baseline.
-- Acceptance:
-  - New runner board shows RS field.
-  - Rank/sort can prioritize RS.
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Signal Quality Engine | ✅ | Volatility compression, breakout readiness, boost velocity |
+| Relative Strength | ✅ | Chain-baseline comparison for momentum |
+| Momentum Decay Filter | ✅ | Half-life tracking, fast-decay detection |
+| Keyboard Controls | ✅ | Chain switching, sort modes, clipboard copy |
+| Risk Firewall | ✅ | Risk scoring, penalty system, flag detection |
+| Rate Budgeting | ✅ | Adaptive 429 handling, runtime stats |
+| Chain-Aware Profiles | ✅ | Strict/balanced/discovery per-chain profiles |
+| MCP Surfaces | ✅ | Tools, resources, and prompts for AI agents |
+| Search Discovery | ✅ | Multi-chain coverage via search augmentation |
+| Alert Guardrails | ✅ | Cooldown, frequency caps, deduplication |
 
-## 3) Risk Control - Momentum Half-Life and Decay Filter
-- Status: `done`
-- Scope:
-  - Track per-token momentum history during watch loops.
-  - Estimate momentum half-life.
-  - Filter fast-decay tokens with configurable thresholds.
-- Acceptance:
-  - CLI supports enabling/disabling decay filter.
-  - Filter reason visible in tags/board hints.
+---
 
-## 4) Watch UX - Keyboard Interactions
-- Status: `done`
-- Scope:
-  - Chain switching hotkeys (`1-9`).
-  - Sort mode toggle (`s`).
-  - Copy selected/top token + pair (`c`).
-- Acceptance:
-  - Footer shows active hotkeys and selected modes.
-  - At least one interactive session demonstrates chain switch and sort mode updates.
+## 🚧 In Progress
 
-## 5) Docs and Validation
-- Status: `done`
-- Scope:
-  - README updates with new options/hotkeys.
-  - Live command verification for `new-runners` and `new-runners-watch`.
-- Acceptance:
-  - Commands run successfully in current environment.
-  - Output includes new analytics columns/panels.
+| Feature | Priority | Description |
+|---------|----------|-------------|
+| Historical Replay | High | Deterministic signal regression tests |
+| Backtest Harness | High | Strategy validation against historical data |
 
-## 6) Runner Noise Control
-- Status: `done`
-- Scope:
-  - Raise default minimum liquidity for runner-oriented commands.
-  - Add anti-thin filter (`max volume/liquidity ratio`).
-- Acceptance:
-  - `new-runners`, `new-runners-watch`, `alpha-drops`, and `alpha-drops-watch` expose the anti-thin option.
-  - Near-zero-liquidity/highly thin candidates are filtered out by default.
+---
 
-## 7) Realtime Alpha Alert Guardrails
-- Status: `done`
-- Scope:
-  - Add hard cap for alert send frequency in watch mode.
-  - Keep cooldown-based alerting and risk gates.
-- Acceptance:
-  - `alpha-drops-watch` supports max alerts/hour.
-  - Status panel explains when alert cap is hit.
+## 📋 Planned (Next 3 Months)
 
-## 8) Discovery and Top-New Reliability
-- Status: `done`
-- Scope:
-  - Add search-seed discovery augmentation to improve multi-chain coverage.
-  - Add 24h transaction filter/column for top-new scans.
-- Acceptance:
-  - Scanner ingests bounded search-based seeds.
-  - `top-new` can filter by 24h txns and explains 1h `N/A` via recent inactivity.
+### Performance & Scale
+- [ ] **WebSocket Support** — Real-time streaming beyond SSE
+- [ ] **Connection Pooling** — Optimize HTTP client for high frequency
+- [ ] **Disk Persistence** — SQLite option for high-volume task history
 
-## 9) Ingestion V2 and Rate Budgeting
-- Status: `done`
-- Scope:
-  - Add adaptive 429 cooldowns with runtime budget stats.
-  - Add community takeover seed ingestion.
-  - Add batched `/tokens/v1` prefetch to reduce per-token endpoint pressure.
-- Acceptance:
-  - Client exposes runtime stats (`requests`, `429`, retries, bucket waits).
-  - Scanner includes community signals and still runs within Dex rate envelope.
+### Data & Integrations
+- [ ] **SolanaFM Integration** — Better Solana holder data
+- [ ] **Twitter Sentiment** — Social signal integration
+- [ ] **TradingView Links** — One-click chart opening
+- [ ] **GeckoTerminal Deep** — Pool-specific analytics
 
-## 10) Explainability + Risk Firewall
-- Status: `done`
-- Scope:
-  - Persist weighted score components for every candidate.
-  - Add risk score/flags and risk penalty to final ranking.
-  - Surface risk in runner and mover tables.
-- Acceptance:
-  - JSON outputs include score component breakdown and risk metadata.
-  - UI shows risk column for fast triage.
+### UX Enhancements
+- [ ] **Custom Themes** — User-defined color schemes
+- [ ] **Export Formats** — CSV, PDF reports
+- [ ] **Notification Center** — Unified alert management
+- [ ] **Mobile PWA** — Progressive web app for mobile
 
-## 11) Chain-Aware Profiles + MCP Surfaces
-- Status: `done`
-- Scope:
-  - Add `strict/balanced/discovery` chain-aware profile system.
-  - Apply profiles to runner/alpha/top-new commands.
-  - Add MCP resources/prompts for profiles/state and operator workflows.
-- Acceptance:
-  - `ds profiles` prints profile thresholds by chain.
-  - MCP exposes resource and prompt surfaces in addition to tools.
+---
+
+## 🎯 Long Term Vision (6+ Months)
+
+### Intelligence
+- [ ] **ML Scoring** — Machine learning model for score refinement
+- [ ] **Anomaly Detection** — Unusual pattern identification
+- [ ] **Cross-Chain Arbitrage** — Multi-chain opportunity detection
+- [ ] **Whale Tracking** — Large holder movement alerts
+
+### Platform
+- [ ] **SaaS Hosting** — Managed cloud version
+- [ ] **Team Collaboration** — Shared presets, team alerts
+- [ ] **Strategy Marketplace** — Community-shared scan strategies
+- [ ] **Mobile Apps** — Native iOS/Android apps
+
+---
+
+## 💡 Community Wishlist
+
+Vote on features by opening an issue with 👍 reactions:
+
+- [ ] NFT floor tracking
+- [ ] Perp/futures integration
+- [ ] Options flow analysis
+- [ ] On-chain metrics (TVL, flows)
+- [ ] Custom webhook templates
+- [ ] Grafana/Prometheus metrics
+
+---
+
+## 📝 Release Schedule
+
+| Version | Target Date | Focus |
+|---------|-------------|-------|
+| v1.1.0 | April 2026 | Historical replay, backtesting |
+| v1.2.0 | May 2026 | SolanaFM, TradingView, themes |
+| v2.0.0 | Q3 2026 | ML scoring, SaaS beta |
+
+---
+
+## 🤝 Contributing
+
+Have an idea? Open an issue with the `enhancement` label:
+
+1. **Problem** — What pain point does this solve?
+2. **Proposal** — How should it work?
+3. **Alternatives** — What else did you consider?
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.

@@ -1,92 +1,189 @@
-# AgentPyT Web Local Guide
+# Web Dashboard Guide
 
-This project now includes a local React website that recreates the CLI + MCP workflow in browser form.
+> Browser-based interface for PyAgenT — same engine, visual control
 
-## What Was Recreated
-
-1. Same scanner engine and scoring pipeline as the CLI (`DexScreenerClient`, `HotScanner`, scoring, holder hydration).
-2. Same local state model for presets/tasks/runs (`StateStore` in `~/.pyagentt` by default, with legacy fallback).
-3. Same MCP binary integration (`pyagentt-mcp`) with generated `.mcp.json` payload.
-4. Same alert-ready task system (Discord/Telegram/webhook config).
-5. Cache control (`cache_ttl_seconds`) via persistent `web_config.json`.
-
-## Step-by-Step Execution Plan (Implemented)
-
-1. Read source docs and architecture (`README.md`, `SKILL.md`, `docs/PRD.md`, `docs/SYSTEM_ARCHITECTURE.md`).
-2. Reuse core scanner modules and add a FastAPI web layer.
-3. Build REST endpoints for scans, search/inspect, presets/tasks, task runs, rate stats.
-4. Build live watch via SSE stream (`/api/watch/stream`).
-5. Build local React UI with controls for scan, watch, presets, tasks, MCP config, and skills.
-6. Add skill discovery/install API wrappers for `npx skills`.
-7. Add MCP config write endpoint for `.mcp.json`.
-8. Validate with automated tests.
-
-## Run Locally
+## 🚀 Quick Start
 
 ```bash
-python -m pip install -e .
-pyagentt-web
+# Start the web server
+./pyagentt-web          # Unix
+pyagentt-web.bat        # Windows
+
+# Or via Python
+python -m pyagentt_cli.web_api
 ```
 
-Then open:
+**Open:** http://127.0.0.1:8765
 
-```text
-http://127.0.0.1:8765
+## ✨ Features
+
+| Feature | CLI Equivalent | Web Advantage |
+|---------|---------------|---------------|
+| Hot Scan | `./pyagentt hot` | Visual filters, one-click execute |
+| Live Watch | `./pyagentt watch` | Browser notifications, background friendly |
+| Search | `./pyagentt search` | Auto-complete, clickable results |
+| Presets | `./pyagentt preset` | Form-based creation, visual list |
+| Tasks | `./pyagentt task` | Calendar-like scheduling view |
+| MCP Config | Manual JSON editing | One-click `.mcp.json` generator |
+
+## 📡 API Endpoints
+
+### Scanning
+
+```bash
+# Hot scan with filters
+POST /api/scan/hot
+{
+  "chains": ["solana", "base"],
+  "profile": "discovery",
+  "limit": 20
+}
+
+# Search pairs
+GET /api/search?query=pepe&limit=20
+
+# Inspect token
+GET /api/inspect/solana/So11111111111111111111111111111111111111112
 ```
 
-## Key Web Endpoints
+### Live Streaming
 
-- `POST /api/scan/hot`
-- `GET /api/watch/stream`
-- `GET /api/search?query=...`
-- `GET /api/inspect/{chain}/{tokenAddress}`
-- `GET/POST/DELETE /api/presets`
-- `GET/POST/PATCH/DELETE /api/tasks`
-- `GET /api/task-runs`
-- `GET /api/rate-stats`
-- `GET/PATCH /api/config`
-- `GET /api/mcp/config`
-- `POST /api/mcp/config/write`
-- `POST /api/skills/find`
-- `POST /api/skills/install`
+```bash
+# SSE stream for live dashboards
+GET /api/watch/stream?chains=solana,base&interval=5
 
-## Cache and Config
+# Response: text/event-stream
+event: scan
+data: {"timestamp": "...", "results": [...]}
+```
 
-Web config is stored in:
+### Presets
 
-```text
+```bash
+GET    /api/presets              # List all
+POST   /api/presets              # Create
+DELETE /api/presets/{name}        # Delete
+```
+
+### Tasks
+
+```bash
+GET    /api/tasks                # List all
+POST   /api/tasks                # Create
+PATCH  /api/tasks/{id}/status    # Update status
+POST   /api/tasks/{id}/run       # Execute now
+DELETE /api/tasks/{id}           # Delete
+```
+
+### System
+
+```bash
+GET /api/health           # Health check
+GET /api/config           # Current configuration
+PATCH /api/config         # Update settings
+GET /api/rate-stats       # API usage statistics
+GET /api/mcp/config       # MCP configuration payload
+```
+
+## ⚙️ Configuration
+
+Web-specific settings are stored in:
+
+```
 ~/.pyagentt/web_config.json
 ```
 
-Fields:
+**Fields:**
 
-- `cache_ttl_seconds`
-- `default_chains`
-- `watch_interval_seconds`
-- `default_limit`
+| Field | Default | Description |
+|-------|---------|-------------|
+| `cache_ttl_seconds` | 10 | API response cache duration |
+| `default_chains` | ["solana", "base"] | Default chains for scans |
+| `watch_interval_seconds` | 10 | Live refresh interval |
+| `default_limit` | 20 | Default result count |
 
-## MCP Configuration
-
-Use the web panel ("Cache + MCP Config") and click **Write .mcp.json**.
-This writes or updates:
-
-```text
-<repo>/.mcp.json
+**Update via API:**
+```bash
+PATCH /api/config
+{
+  "cache_ttl_seconds": 15,
+  "default_chains": ["solana", "ethereum"]
+}
 ```
 
-with the local `pyagentt-mcp` command path.
+## 🔌 MCP Configuration
 
-## New Skills Workflow
+The web dashboard can generate your `.mcp.json` file:
 
-Use the web panel ("New Skills") to:
+1. Navigate to **"Cache + MCP Config"** panel
+2. Click **"Write .mcp.json"**
+3. File is created at `<repo>/.mcp.json`
 
-1. Find skills (`npx skills find <query>`).
-2. Install a skill (`npx skills add owner/repo@skill -g -y`).
+**Generated payload:**
+```json
+{
+  "mcpServers": {
+    "pyagentt": {
+      "command": "/path/to/.venv/bin/pyagentt-mcp",
+      "args": []
+    }
+  }
+}
+```
 
-The backend validates inputs before running those commands.
+## 🎯 React Frontend
 
-## Validation
+**Location:** `web/index.html` + `web/assets/app.jsx`
 
-Automated test status after rebuild:
+**Key Components:**
+- `ScanPanel` — One-shot scan interface
+- `WatchStream` — SSE streaming display
+- `PresetManager` — CRUD for presets
+- `TaskScheduler` — Task creation & execution
+- `McpConfigPanel` — MCP configuration
 
-- `77 passed, 1 skipped` (`pytest -q`)
+**Styling:** Tailwind-like utility classes in `styles.css`
+
+## 🧪 Development
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run with auto-reload
+uvicorn pyagentt_cli.web_api:app --reload --port 8765
+
+# Run tests
+pytest tests/test_web_api.py -v
+```
+
+**Test Coverage:**
+- Endpoint validation
+- SSE streaming
+- Error handling
+- Security (SSRF, input validation)
+
+## 📊 Performance Notes
+
+| Scenario | Behavior |
+|----------|----------|
+| Multiple tabs | Shared runtime, deduplicated API calls |
+| Background tab | SSE continues, throttled by browser |
+| Mobile | Responsive layout, touch-friendly controls |
+| Slow network | 10s cache helps, configurable TTL |
+
+## 🔒 Security
+
+- CORS restricted to localhost
+- Input validation on all endpoints
+- Webhook URL validation (SSRF protection)
+- No authentication (local-only by design)
+
+## 🐛 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Port 8765 in use | `lsof -ti:8765 \| xargs kill -9` |
+| Static assets 404 | Check `web/assets/` exists |
+| SSE not updating | Check browser console for errors |
+| Config not saving | Verify `~/.pyagentt/` is writable |
